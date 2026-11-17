@@ -1,6 +1,6 @@
 # TM-V71A display proxy
 
-A small board that sits in the cable between a **Kenwood TM-V71A** radio and its separated control head. It sets the head's display brightness from the vehicle's lights: one brightness level with the lights off, another with them on, switching automatically.
+A small board that sits in the cable between a **Kenwood TM-V71A** radio and its separated control head. It sets the head's display brightness from the vehicle's lights: one brightness level with the lights off, another with them on, switching automatically. It remembers the brightness last set from the control head in each mode.
 
 The TM-V71A has a single display brightness setting. A level that's readable in daylight is glaring at night, so you end up changing it in the menu twice a day. This board does it for you.
 
