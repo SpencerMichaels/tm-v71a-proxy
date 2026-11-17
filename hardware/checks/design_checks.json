@@ -1,0 +1,149 @@
+{
+  "results": [
+    {
+      "check": "ERC: zero violations",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "Netlist parity with design intent",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "J1 pin1 PB / pin2 GND / pin4 HEAD_TXD (head -> body, measured)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "J2 pin1 PB / pin2 GND / pin4 HEAD_TXD (head -> body, measured)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "J1 pin3 = BODY_TXD, J2 pin3 = HEAD_RXD (body -> head on pin 3, measured)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "HEAD_TXD direct copper J2.4 to J1.4",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "PB nets touch only jacks, R1, C5, C6, U2 and PWR_FLAG",
+      "pass": true,
+      "detail": "['C5', 'C6', 'J1', 'J2', 'R1', 'U2']"
+    },
+    {
+      "check": "PB direct copper J1.1 to J2.1; board supply via R1",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "HEAD_RXD connections limited to J2, JP1, R2, J5 (test tap)",
+      "pass": true,
+      "detail": "[('J2', '3'), ('J5', '4'), ('JP1', '2'), ('R2', '2')]"
+    },
+    {
+      "check": "BODY_TXD connections limited to J1, JP1, R6 (tap)",
+      "pass": true,
+      "detail": "[('J1', '3'), ('JP1', '1'), ('R6', '1')]"
+    },
+    {
+      "check": "Proxy output: U1 pin 2 (PC0, USART1 TX) -> R2 -> HEAD_RXD",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "JP1 hard bypass is the only part bridging BODY_TXD and HEAD_RXD",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "No U1 pin directly on any radio-line net",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "J5 taps: GND, TAP_BODY, TAP_HEAD, HEAD_RXD",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "TAP_BODY/TAP_HEAD only reach the radio through R6/R7 10k",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "ILL side isolated (only J3, R9, R10, D1, U3 LED pins)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "U1 USART0 PA1/PA0, USART1 PC1/PC0, XOSC32K PF0/PF1, UPDI",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "U1 VDD/AVDD/VDDIO2 on +5V, GND/AGND on GND",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "Proxy low level at head < 1.5 V (TC4S81F VIL max)",
+      "pass": true,
+      "detail": "0.06 V"
+    },
+    {
+      "check": "Proxy edge RC at head < 1 us (bit = 17.4 us)",
+      "pass": true,
+      "detail": "0.33 us"
+    },
+    {
+      "check": "JP1 fitted with U1 present: contention <= 4 mA (HC4050 recommended)",
+      "pass": true,
+      "detail": "3.45 mA"
+    },
+    {
+      "check": "JP1 bypass (U1 removed) low level at head < 1.5 V",
+      "pass": true,
+      "detail": "0.11 V"
+    },
+    {
+      "check": "ILL LED off with ILL+ at 2 V (lights off)",
+      "pass": true,
+      "detail": "0.00 mA"
+    },
+    {
+      "check": "ILL LED current >= 1.0 mA at 9 V input",
+      "pass": true,
+      "detail": "1.88 mA"
+    },
+    {
+      "check": "Estimated board draw <= 10 mA PB target",
+      "pass": true,
+      "detail": "5.1 mA (typical, not measured)"
+    }
+  ],
+  "calculations": {
+    "proxy_low_at_head_V": 0.06476033370458319,
+    "proxy_head_rc_us": 0.33459,
+    "jp1_with_u1_contention_mA": 3.4539473684210527,
+    "jp1_bypass_low_at_head_V": 0.11205101509630401,
+    "ill_led_mA_at_13V": 3.6951871657754003,
+    "ill_led_mA_at_9V": 1.8770053475935826,
+    "ill_R9_W_at_14V": 0.07505568181818181,
+    "ill_led_mA_at_2V": 0.0,
+    "pb_fault_current_mA_R1_short": 66.66666666666667,
+    "R1_fault_W": 0.6666666666666666,
+    "est_board_current_mA": {
+      "mcu_20MHz_active_typ": 4.4,
+      "ldo_iq": 0.2,
+      "opto_pullup_max": 0.5,
+      "taps": 0.0
+    },
+    "est_board_total_mA": 5.1
+  },
+  "net_count": 34
+}

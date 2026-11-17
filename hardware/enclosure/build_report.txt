@@ -1,0 +1,6 @@
+checks: PASS
+kp_case_base.stl: 2180 facets, watertight=True, non-manifold=False, self-intersecting=False
+kp_case_cover.stl: 7164 facets, watertight=True, non-manifold=False, self-intersecting=False
+outer size: 59.0 x 57.0 x 25.6 mm
+board top at Z=7.6, ceiling Z=23.6
+screw: M3 x 14 from below, head under the floor; thread engagement in cover post = 6.4 mm

@@ -1,0 +1,1574 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>kenwood_proxy.kicad_sch</source>
+    <date>2026-11-16T22:29:08</date>
+    <tool>Eeschema 10.0.6</tool>
+    <textvar name="REVISION">B</textvar>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>Kenwood TM-V71A proxy</title>
+        <company/>
+        <rev>B</rev>
+        <date>2026-11-15</date>
+        <source>kenwood_proxy.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="2" name="/01  Kenwood radio link/" tstamps="/39fbcc2b-989d-55a5-b553-e6908a02e8ee/">
+      <title_block>
+        <title>01  Kenwood radio link</title>
+        <company/>
+        <rev>B</rev>
+        <date>2026-11-15</date>
+        <source>01_radio_link.kicad_sch</source>
+        <comment number="1" value="Electrical draft - not released for fabrication"/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="3" name="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/">
+      <title_block>
+        <title>02  PB supply and AVR128DB28</title>
+        <company/>
+        <rev>B</rev>
+        <date>2026-11-15</date>
+        <source>02_power_mcu.kicad_sch</source>
+        <comment number="1" value="Electrical draft - not released for fabrication"/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="4" name="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/">
+      <title_block>
+        <title>03  ILL input and programming header</title>
+        <company/>
+        <rev>B</rev>
+        <date>2026-11-15</date>
+        <source>03_ill_prog.kicad_sch</source>
+        <comment number="1" value="Electrical draft - not released for fabrication"/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="J1">
+      <value>KENWOOD BODY</value>
+      <footprint>Kenwood_Proxy:Wurth_615004143821_4P4C_TabUp</footprint>
+      <fields>
+        <field name="MPN">615004143821</field>
+        <field name="Manufacturer">Wurth Elektronik</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Cable from radio body (already 4P4C). Pin 3 = body TX (measured), pin 4 = body RX, 2 = GND, 1 = PB</field>
+        <field name="Footprint">Kenwood_Proxy:Wurth_615004143821_4P4C_TabUp</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="WR-MJ_4P4C_TabUp" description="Wurth 615004143821 4P4C. Manufacturer numbering: looking into mating face, tab up, contacts 4,3,2,1 left to right."/>
+      <property name="MPN" value="615004143821"/>
+      <property name="Manufacturer" value="Wurth Elektronik"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Cable from radio body (already 4P4C). Pin 3 = body TX (measured), pin 4 = body RX, 2 = GND, 1 = PB"/>
+      <property name="Sheetname" value="01  Kenwood radio link"/>
+      <property name="Sheetfile" value="01_radio_link.kicad_sch"/>
+      <sheetpath names="/01  Kenwood radio link/" tstamps="/39fbcc2b-989d-55a5-b553-e6908a02e8ee/"/>
+      <tstamps>1e48de37-a58c-53f2-bfa4-89f24890d626</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J2">
+      <value>KENWOOD HEAD</value>
+      <footprint>Kenwood_Proxy:Wurth_615004143821_4P4C_TabUp</footprint>
+      <fields>
+        <field name="MPN">615004143821</field>
+        <field name="Manufacturer">Wurth Elektronik</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Straight-through cable to control head. Identical pinout to J1</field>
+        <field name="Footprint">Kenwood_Proxy:Wurth_615004143821_4P4C_TabUp</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="WR-MJ_4P4C_TabUp" description="Wurth 615004143821 4P4C. Manufacturer numbering: looking into mating face, tab up, contacts 4,3,2,1 left to right."/>
+      <property name="MPN" value="615004143821"/>
+      <property name="Manufacturer" value="Wurth Elektronik"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Straight-through cable to control head. Identical pinout to J1"/>
+      <property name="Sheetname" value="01  Kenwood radio link"/>
+      <property name="Sheetfile" value="01_radio_link.kicad_sch"/>
+      <sheetpath names="/01  Kenwood radio link/" tstamps="/39fbcc2b-989d-55a5-b553-e6908a02e8ee/"/>
+      <tstamps>dc4d1a16-f7a7-54d5-8287-868d94047f0c</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J5">
+      <value>DATA TAPS</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical</footprint>
+      <fields>
+        <field name="MPN">PRPC040SAAN-RC</field>
+        <field name="Manufacturer">Sullins</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Bench/test taps for a logic analyzer or USB-serial RX: 1 GND, 2 body-&gt;head (via R6 10k), 3 head-&gt;body (via R7 10k), 4 what the head receives (after R2 470R). Snapped from the 40-pin strip. Listen only: never connect an adapter TX or power</field>
+        <field name="Footprint">Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Connector_Generic_Conn_01x04" description="Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="MPN" value="PRPC040SAAN-RC"/>
+      <property name="Manufacturer" value="Sullins"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Bench/test taps for a logic analyzer or USB-serial RX: 1 GND, 2 body-&gt;head (via R6 10k), 3 head-&gt;body (via R7 10k), 4 what the head receives (after R2 470R). Snapped from the 40-pin strip. Listen only: never connect an adapter TX or power"/>
+      <property name="Sheetname" value="01  Kenwood radio link"/>
+      <property name="Sheetfile" value="01_radio_link.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/01  Kenwood radio link/" tstamps="/39fbcc2b-989d-55a5-b553-e6908a02e8ee/"/>
+      <tstamps>a29a4f7f-f631-51fa-b0fe-2c80b5505ebf</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="JP1">
+      <value>HARD BYPASS</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical</footprint>
+      <fields>
+        <field name="MPN">TSW-102-07-G-S</field>
+        <field name="Manufacturer">Samtec</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Leave OPEN normally. Recovery only: remove U1 AND fit shunt -&gt; direct copper body-&gt;head. Shunt is separate accessory SNT-100-BK-G</field>
+        <field name="Footprint">Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Connector_Generic_Conn_01x02" description="Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="MPN" value="TSW-102-07-G-S"/>
+      <property name="Manufacturer" value="Samtec"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Leave OPEN normally. Recovery only: remove U1 AND fit shunt -&gt; direct copper body-&gt;head. Shunt is separate accessory SNT-100-BK-G"/>
+      <property name="Sheetname" value="01  Kenwood radio link"/>
+      <property name="Sheetfile" value="01_radio_link.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/01  Kenwood radio link/" tstamps="/39fbcc2b-989d-55a5-b553-e6908a02e8ee/"/>
+      <tstamps>16836e9c-c4d1-58aa-b1aa-aa0f11a63604</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R2">
+      <value>470R</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">MFR-25FBF52-470R</field>
+        <field name="Manufacturer">YAGEO</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">MCU USART1 TX -&gt; head RX series resistor: limits current into head input clamps and into the body driver if JP1 is fitted with U1 present (&lt;=3.5 mA)</field>
+        <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_R" description="Resistor"/>
+      <property name="MPN" value="MFR-25FBF52-470R"/>
+      <property name="Manufacturer" value="YAGEO"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="MCU USART1 TX -&gt; head RX series resistor: limits current into head input clamps and into the body driver if JP1 is fitted with U1 present (&lt;=3.5 mA)"/>
+      <property name="Sheetname" value="01  Kenwood radio link"/>
+      <property name="Sheetfile" value="01_radio_link.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/01  Kenwood radio link/" tstamps="/39fbcc2b-989d-55a5-b553-e6908a02e8ee/"/>
+      <tstamps>b99db5a9-530d-5467-8726-0745f005212f</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R6">
+      <value>10k</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">MFR-25FBF52-10K</field>
+        <field name="Manufacturer">YAGEO</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">MCU USART0 RX tap on the body stream; limits clamp current when U1 is unpowered</field>
+        <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_R" description="Resistor"/>
+      <property name="MPN" value="MFR-25FBF52-10K"/>
+      <property name="Manufacturer" value="YAGEO"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="MCU USART0 RX tap on the body stream; limits clamp current when U1 is unpowered"/>
+      <property name="Sheetname" value="01  Kenwood radio link"/>
+      <property name="Sheetfile" value="01_radio_link.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/01  Kenwood radio link/" tstamps="/39fbcc2b-989d-55a5-b553-e6908a02e8ee/"/>
+      <tstamps>eef3404b-25f9-544e-b4e3-7c19101c566b</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R7">
+      <value>10k</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">MFR-25FBF52-10K</field>
+        <field name="Manufacturer">YAGEO</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">MCU USART1 RX tap on the head stream (logging); limits clamp current when U1 is unpowered</field>
+        <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_R" description="Resistor"/>
+      <property name="MPN" value="MFR-25FBF52-10K"/>
+      <property name="Manufacturer" value="YAGEO"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="MCU USART1 RX tap on the head stream (logging); limits clamp current when U1 is unpowered"/>
+      <property name="Sheetname" value="01  Kenwood radio link"/>
+      <property name="Sheetfile" value="01_radio_link.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/01  Kenwood radio link/" tstamps="/39fbcc2b-989d-55a5-b553-e6908a02e8ee/"/>
+      <tstamps>faed539d-9716-5afd-be0c-90f9a85ffc34</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C1">
+      <value>100nF 50V X7R</value>
+      <footprint>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</footprint>
+      <fields>
+        <field name="MPN">C320C104K5R5TA</field>
+        <field name="Manufacturer">KEMET</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Decoupling at U1 VDD pin 20</field>
+        <field name="Footprint">Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_C" description="Unpolarized capacitor"/>
+      <property name="MPN" value="C320C104K5R5TA"/>
+      <property name="Manufacturer" value="KEMET"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Decoupling at U1 VDD pin 20"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>5813bfda-a209-503c-9d49-e1c2adc0f094</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C2">
+      <value>100nF 50V X7R</value>
+      <footprint>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</footprint>
+      <fields>
+        <field name="MPN">C320C104K5R5TA</field>
+        <field name="Manufacturer">KEMET</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Decoupling at U1 AVDD pin 14</field>
+        <field name="Footprint">Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_C" description="Unpolarized capacitor"/>
+      <property name="MPN" value="C320C104K5R5TA"/>
+      <property name="Manufacturer" value="KEMET"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Decoupling at U1 AVDD pin 14"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>5ec3aedf-b0ff-5b76-bf5d-6f757401cb3f</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C3">
+      <value>100nF 50V X7R</value>
+      <footprint>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</footprint>
+      <fields>
+        <field name="MPN">C320C104K5R5TA</field>
+        <field name="Manufacturer">KEMET</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Decoupling at U1 VDDIO2 pin 6</field>
+        <field name="Footprint">Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_C" description="Unpolarized capacitor"/>
+      <property name="MPN" value="C320C104K5R5TA"/>
+      <property name="Manufacturer" value="KEMET"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Decoupling at U1 VDDIO2 pin 6"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>dd97b248-4c6c-507e-90ee-066e78daf07b</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C4">
+      <value>22uF 16V tantalum</value>
+      <footprint>Capacitor_THT:CP_Radial_Tantal_D6.0mm_P2.50mm</footprint>
+      <fields>
+        <field name="MPN">T350F226K016AT</field>
+        <field name="Manufacturer">KEMET</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Dipped tantalum, 6.0 mm dia, 2.54 mm pitch; ESR within LM2936 0.3-8 ohm stability window (also fine for alt U2 AP7381-50V-A)</field>
+        <field name="Footprint">Capacitor_THT:CP_Radial_Tantal_D6.0mm_P2.50mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_C_Polarized" description="Polarized capacitor"/>
+      <property name="MPN" value="T350F226K016AT"/>
+      <property name="Manufacturer" value="KEMET"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Dipped tantalum, 6.0 mm dia, 2.54 mm pitch; ESR within LM2936 0.3-8 ohm stability window (also fine for alt U2 AP7381-50V-A)"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="CP_*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>6a2d1fac-26dc-571a-8ed4-0f75dfed3455</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C5">
+      <value>100nF 50V X7R</value>
+      <footprint>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</footprint>
+      <fields>
+        <field name="MPN">C320C104K5R5TA</field>
+        <field name="Manufacturer">KEMET</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote"/>
+        <field name="Footprint">Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_C" description="Unpolarized capacitor"/>
+      <property name="MPN" value="C320C104K5R5TA"/>
+      <property name="Manufacturer" value="KEMET"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value=""/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>44de9752-3f75-50fc-b9d3-a4960754b517</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C6">
+      <value>10uF 25V 105C</value>
+      <footprint>Capacitor_THT:CP_Radial_D5.0mm_P2.00mm</footprint>
+      <fields>
+        <field name="MPN">EEA-FC1E100</field>
+        <field name="Manufacturer">Panasonic</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Radial aluminium, 105 C (behind the dash). EEA-FC1E100 is 4x7 mm with 1.5 mm lead pitch: spread the leads slightly into this 5 mm / 2.0 mm footprint. Any 10 uF &gt;=25 V 105 C radial, 4-5 mm dia. 150R x 10uF ~ 106 Hz corner</field>
+        <field name="Footprint">Capacitor_THT:CP_Radial_D5.0mm_P2.00mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_C_Polarized" description="Polarized capacitor"/>
+      <property name="MPN" value="EEA-FC1E100"/>
+      <property name="Manufacturer" value="Panasonic"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Radial aluminium, 105 C (behind the dash). EEA-FC1E100 is 4x7 mm with 1.5 mm lead pitch: spread the leads slightly into this 5 mm / 2.0 mm footprint. Any 10 uF &gt;=25 V 105 C radial, 4-5 mm dia. 150R x 10uF ~ 106 Hz corner"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="CP_*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>61d82bb4-2d32-59d0-8c7a-a0a27d1a2551</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C7">
+      <value>15pF C0G</value>
+      <footprint>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</footprint>
+      <fields>
+        <field name="MPN">C315C150J1G5TA</field>
+        <field name="Manufacturer">KEMET</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Crystal load, C0G</field>
+        <field name="Footprint">Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_C" description="Unpolarized capacitor"/>
+      <property name="MPN" value="C315C150J1G5TA"/>
+      <property name="Manufacturer" value="KEMET"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Crystal load, C0G"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>56f07315-6a60-5a31-940a-c78feb3a5164</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C8">
+      <value>15pF C0G</value>
+      <footprint>Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</footprint>
+      <fields>
+        <field name="MPN">C315C150J1G5TA</field>
+        <field name="Manufacturer">KEMET</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Crystal load, C0G</field>
+        <field name="Footprint">Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_C" description="Unpolarized capacitor"/>
+      <property name="MPN" value="C315C150J1G5TA"/>
+      <property name="Manufacturer" value="KEMET"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Crystal load, C0G"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>5bb7d7b1-60d9-5007-9900-910caf2c72c6</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R1">
+      <value>150R 1W</value>
+      <footprint>Resistor_THT:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">FMP100JR-52-150R</field>
+        <field name="Manufacturer">YAGEO</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">5%, 1 W flameproof. Limits PB fault current (~67 mA into a short), RC-isolates MCU noise from PB, and doubles as board-current sense (V/150)</field>
+        <field name="Footprint">Resistor_THT:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_R" description="Resistor"/>
+      <property name="MPN" value="FMP100JR-52-150R"/>
+      <property name="Manufacturer" value="YAGEO"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="5%, 1 W flameproof. Limits PB fault current (~67 mA into a short), RC-isolates MCU noise from PB, and doubles as board-current sense (V/150)"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>8e210999-1427-586e-a9b0-a15d7a8b84ff</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP2">
+      <value>GND</value>
+      <footprint>TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm</footprint>
+      <fields>
+        <field name="MPN"/>
+        <field name="Manufacturer"/>
+        <field name="Assembly">PCB_FEATURE</field>
+        <field name="DesignNote">Bare plated test pad (2.0 mm, 1.0 mm hole): probe, hook or solder a wire. No purchased part</field>
+        <field name="Footprint">TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Connector_TestPoint" description="test point"/>
+      <property name="MPN" value=""/>
+      <property name="Manufacturer" value=""/>
+      <property name="Assembly" value="PCB_FEATURE"/>
+      <property name="DesignNote" value="Bare plated test pad (2.0 mm, 1.0 mm hole): probe, hook or solder a wire. No purchased part"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>b0121ab0-fbc7-50c7-b9e2-388b2f346116</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U1">
+      <value>AVR128DB28-I/SP</value>
+      <footprint>Package_DIP:DIP-28_W7.62mm_Socket</footprint>
+      <datasheet>https://ww1.microchip.com/downloads/en/DeviceDoc/AVR128DB28-32-48-64-DataSheet-DS40002247A.pdf</datasheet>
+      <fields>
+        <field name="MPN">AVR128DB28-I/SP</field>
+        <field name="Manufacturer">Microchip</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Socketed SPDIP-28. 5 V, internal OSCHF auto-tuned to XOSC32K</field>
+        <field name="Footprint">Package_DIP:DIP-28_W7.62mm_Socket</field>
+        <field name="Datasheet">https://ww1.microchip.com/downloads/en/DeviceDoc/AVR128DB28-32-48-64-DataSheet-DS40002247A.pdf</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="MCU_Microchip_AVR_Dx_AVR128DB28x-xSP" description="24MHz, 128kB Flash, 16kB SRAM, EEPROM with Op Amps and Multi-Voltage I/O, SPDIP-28"/>
+      <property name="MPN" value="AVR128DB28-I/SP"/>
+      <property name="Manufacturer" value="Microchip"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Socketed SPDIP-28. 5 V, internal OSCHF auto-tuned to XOSC32K"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="AVR 8bit Microcontroller AVR-DB"/>
+      <property name="ki_fp_filters" value="DIP*W7.62mm*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>79f5377c-26e2-5eda-9c6e-060788c4aa28</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="19"/>
+            <pin num="16"/>
+            <pin num="17"/>
+            <pin num="18"/>
+            <pin num="7"/>
+            <pin num="8"/>
+            <pin num="9"/>
+            <pin num="10"/>
+            <pin num="11"/>
+            <pin num="12"/>
+            <pin num="13"/>
+            <pin num="14"/>
+            <pin num="15"/>
+            <pin num="20"/>
+            <pin num="21"/>
+            <pin num="6"/>
+            <pin num="22"/>
+            <pin num="23"/>
+            <pin num="24"/>
+            <pin num="25"/>
+            <pin num="26"/>
+            <pin num="27"/>
+            <pin num="28"/>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+            <pin num="4"/>
+            <pin num="5"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U2">
+      <value>LM2936Z-5.0</value>
+      <footprint>Package_TO_SOT_THT:TO-92_Inline_Wide</footprint>
+      <datasheet>http://www.ti.com/lit/ds/symlink/lm2936.pdf</datasheet>
+      <fields>
+        <field name="MPN">LM2936Z-5.0/NOPB</field>
+        <field name="Manufacturer">Texas Instruments</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">TO-92 1=OUT 2=GND 3=IN. 40 V operating, 15 uA Iq. COUT &gt;= 10 uF with 0.3-8 ohm ESR. Drop-in alt (same pinout): Diodes AP7381-50V-A</field>
+        <field name="Footprint">Package_TO_SOT_THT:TO-92_Inline_Wide</field>
+        <field name="Datasheet">http://www.ti.com/lit/ds/symlink/lm2936.pdf</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Regulator_Linear_LM2936-5.0_TO92" description="50mA Ultra-Low Quiescent Current LDO Voltage Regulator, 5.0V fixed output, TO-92"/>
+      <property name="MPN" value="LM2936Z-5.0/NOPB"/>
+      <property name="Manufacturer" value="Texas Instruments"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="TO-92 1=OUT 2=GND 3=IN. 40 V operating, 15 uA Iq. COUT &gt;= 10 uF with 0.3-8 ohm ESR. Drop-in alt (same pinout): Diodes AP7381-50V-A"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="linear regulator ldo fixed positive"/>
+      <property name="ki_fp_filters" value="TO?92*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>a369b668-dabd-5db4-a7c9-6018ad585a6a</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="3"/>
+            <pin num="2"/>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="Y1">
+      <value>32.768kHz 12.5pF</value>
+      <footprint>Crystal:Crystal_DS26_D2.0mm_L6.0mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">AB26T-32.768KHZ</field>
+        <field name="Manufacturer">Abracon</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Through-hole long-lead variant (Rev A used AB26TRB, whose short formed leads barely reach). CL 12.5 pF, ESR 50k max (AVR XOSC32K limit 100k). Short traces, ground guard</field>
+        <field name="Footprint">Crystal:Crystal_DS26_D2.0mm_L6.0mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_Crystal" description="Two pin crystal"/>
+      <property name="MPN" value="AB26T-32.768KHZ"/>
+      <property name="Manufacturer" value="Abracon"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Through-hole long-lead variant (Rev A used AB26TRB, whose short formed leads barely reach). CL 12.5 pF, ESR 50k max (AVR XOSC32K limit 100k). Short traces, ground guard"/>
+      <property name="Sheetname" value="02  PB supply and AVR128DB28"/>
+      <property name="Sheetfile" value="02_power_mcu.kicad_sch"/>
+      <property name="ki_keywords" value="quartz ceramic resonator oscillator"/>
+      <property name="ki_fp_filters" value="Crystal*"/>
+      <sheetpath names="/02  PB supply and AVR128DB28/" tstamps="/6463564e-b445-5ffa-8d80-8c701966980b/"/>
+      <tstamps>c583deef-e51e-5b58-be77-685b814bfd68</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="D1">
+      <value>1N4148</value>
+      <footprint>Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal</footprint>
+      <datasheet>https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf</datasheet>
+      <fields>
+        <field name="MPN">1N4148</field>
+        <field name="Manufacturer">onsemi</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Antiparallel LED reverse protection (K=pin1 on ILL_LED_A)</field>
+        <field name="Footprint">Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal</field>
+        <field name="Datasheet">https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Diode_1N4148" description="100V 0.15A standard switching diode, DO-35"/>
+      <property name="MPN" value="1N4148"/>
+      <property name="Manufacturer" value="onsemi"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Antiparallel LED reverse protection (K=pin1 on ILL_LED_A)"/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="ki_keywords" value="diode"/>
+      <property name="ki_fp_filters" value="D*DO?35*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>77d69b57-934f-5a12-a02d-73f7490c41d4</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="H1">
+      <value>M3</value>
+      <footprint>MountingHole:MountingHole_3.2mm_M3</footprint>
+      <fields>
+        <field name="MPN"/>
+        <field name="Manufacturer"/>
+        <field name="Assembly">PCB_FEATURE</field>
+        <field name="DesignNote"/>
+        <field name="Footprint">MountingHole:MountingHole_3.2mm_M3</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Mechanical_MountingHole" description="Mounting Hole without connection"/>
+      <property name="MPN" value=""/>
+      <property name="Manufacturer" value=""/>
+      <property name="Assembly" value="PCB_FEATURE"/>
+      <property name="DesignNote" value=""/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="mounting hole"/>
+      <property name="ki_fp_filters" value="MountingHole*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>5d1a5284-13e3-5343-a0f8-c37164ef8b3f</tstamps>
+      <units>
+        <unit name="A">
+          <pins/>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="H2">
+      <value>M3</value>
+      <footprint>MountingHole:MountingHole_3.2mm_M3</footprint>
+      <fields>
+        <field name="MPN"/>
+        <field name="Manufacturer"/>
+        <field name="Assembly">PCB_FEATURE</field>
+        <field name="DesignNote"/>
+        <field name="Footprint">MountingHole:MountingHole_3.2mm_M3</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Mechanical_MountingHole" description="Mounting Hole without connection"/>
+      <property name="MPN" value=""/>
+      <property name="Manufacturer" value=""/>
+      <property name="Assembly" value="PCB_FEATURE"/>
+      <property name="DesignNote" value=""/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="mounting hole"/>
+      <property name="ki_fp_filters" value="MountingHole*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>0a34906a-c0f9-55f1-bfcf-1f9a7e7e3176</tstamps>
+      <units>
+        <unit name="A">
+          <pins/>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="H3">
+      <value>M3</value>
+      <footprint>MountingHole:MountingHole_3.2mm_M3</footprint>
+      <fields>
+        <field name="MPN"/>
+        <field name="Manufacturer"/>
+        <field name="Assembly">PCB_FEATURE</field>
+        <field name="DesignNote"/>
+        <field name="Footprint">MountingHole:MountingHole_3.2mm_M3</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Mechanical_MountingHole" description="Mounting Hole without connection"/>
+      <property name="MPN" value=""/>
+      <property name="Manufacturer" value=""/>
+      <property name="Assembly" value="PCB_FEATURE"/>
+      <property name="DesignNote" value=""/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="mounting hole"/>
+      <property name="ki_fp_filters" value="MountingHole*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>8d97a673-ffc3-50c9-9cf7-303bc155c09b</tstamps>
+      <units>
+        <unit name="A">
+          <pins/>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="H4">
+      <value>M3</value>
+      <footprint>MountingHole:MountingHole_3.2mm_M3</footprint>
+      <fields>
+        <field name="MPN"/>
+        <field name="Manufacturer"/>
+        <field name="Assembly">PCB_FEATURE</field>
+        <field name="DesignNote"/>
+        <field name="Footprint">MountingHole:MountingHole_3.2mm_M3</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Mechanical_MountingHole" description="Mounting Hole without connection"/>
+      <property name="MPN" value=""/>
+      <property name="Manufacturer" value=""/>
+      <property name="Assembly" value="PCB_FEATURE"/>
+      <property name="DesignNote" value=""/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="mounting hole"/>
+      <property name="ki_fp_filters" value="MountingHole*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>7f114f9d-1e5c-5a27-9f01-3a10e0c81c56</tstamps>
+      <units>
+        <unit name="A">
+          <pins/>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J3">
+      <value>ILL+ / GND</value>
+      <footprint>Connector_Molex:Molex_Micro-Fit_3.0_43045-0200_2x01_P3.00mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">43045-0200</field>
+        <field name="Manufacturer">Molex</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Micro-Fit 3.0 2-circuit dual-row right-angle header, latching. Mates with 2-circuit receptacle 43025-0200 (pre-crimped 22 AWG leads are fine). Pin1 ILL+ (TAIL, R1-10), pin2 chassis GND (e.g. stereo harness ground). Optocoupler keeps truck wiring isolated from radio GND</field>
+        <field name="Footprint">Connector_Molex:Molex_Micro-Fit_3.0_43045-0200_2x01_P3.00mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Connector_Generic_Conn_01x02" description="Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="MPN" value="43045-0200"/>
+      <property name="Manufacturer" value="Molex"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Micro-Fit 3.0 2-circuit dual-row right-angle header, latching. Mates with 2-circuit receptacle 43025-0200 (pre-crimped 22 AWG leads are fine). Pin1 ILL+ (TAIL, R1-10), pin2 chassis GND (e.g. stereo harness ground). Optocoupler keeps truck wiring isolated from radio GND"/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>ab954f45-aef1-51fb-a412-1853dc4fcbd0</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J4">
+      <value>PROG/DEBUG</value>
+      <footprint>Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical</footprint>
+      <fields>
+        <field name="MPN">TSW-103-07-G-S</field>
+        <field name="Manufacturer">Samtec</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">0.1 in header for bench programming/logging before the board goes behind the dash. UPDI Friend (or other 5 V SerialUPDI adapter): GND + UPDI. Logging: separate 5 V USB-serial RX on DBG_TX. Never connect adapter power</field>
+        <field name="Footprint">Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Connector_Generic_Conn_01x03" description="Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="MPN" value="TSW-103-07-G-S"/>
+      <property name="Manufacturer" value="Samtec"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="0.1 in header for bench programming/logging before the board goes behind the dash. UPDI Friend (or other 5 V SerialUPDI adapter): GND + UPDI. Logging: separate 5 V USB-serial RX on DBG_TX. Never connect adapter power"/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>a316dd84-d4d0-562e-a873-981a39509578</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R9">
+      <value>2.2k</value>
+      <footprint>Resistor_THT:R_Axial_DIN0309_L9.0mm_D3.2mm_P12.70mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">MFR50SFTE52-2K2</field>
+        <field name="Manufacturer">YAGEO</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">0.5 W metal film. ~5.4 mA at 13 V; 0.23 W at 24 V continuous; 40 V load-dump pulse 0.26 J/400 ms</field>
+        <field name="Footprint">Resistor_THT:R_Axial_DIN0309_L9.0mm_D3.2mm_P12.70mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_R" description="Resistor"/>
+      <property name="MPN" value="MFR50SFTE52-2K2"/>
+      <property name="Manufacturer" value="YAGEO"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="0.5 W metal film. ~5.4 mA at 13 V; 0.23 W at 24 V continuous; 40 V load-dump pulse 0.26 J/400 ms"/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>2611ac9e-3b51-58c7-bb60-8bf9675c345d</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R10">
+      <value>680R</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">MFR-25FBF52-680R</field>
+        <field name="Manufacturer">YAGEO</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">LED shunt: LED needs &gt;~1.7 mA total input current, so leakage cannot half-turn-on the opto. Simulated</field>
+        <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_R" description="Resistor"/>
+      <property name="MPN" value="MFR-25FBF52-680R"/>
+      <property name="Manufacturer" value="YAGEO"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="LED shunt: LED needs &gt;~1.7 mA total input current, so leakage cannot half-turn-on the opto. Simulated"/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>7c099c22-83d9-5079-ad28-d54dbd3142c9</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R11">
+      <value>10k</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">MFR-25FBF52-10K</field>
+        <field name="Manufacturer">YAGEO</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Opto pull-up; ILL_SENSE LOW while ILL+ is on (lights on)</field>
+        <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_R" description="Resistor"/>
+      <property name="MPN" value="MFR-25FBF52-10K"/>
+      <property name="Manufacturer" value="YAGEO"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Opto pull-up; ILL_SENSE LOW while ILL+ is on (lights on)"/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>8c235c1f-634f-5153-85c7-7d130c897412</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R13">
+      <value>470R</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
+      <fields>
+        <field name="MPN">MFR-25FBF52-470R</field>
+        <field name="Manufacturer">YAGEO</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">Protects PA0 if a jumper or adapter TX lands on the DBG_TX pin</field>
+        <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Device_R" description="Resistor"/>
+      <property name="MPN" value="MFR-25FBF52-470R"/>
+      <property name="Manufacturer" value="YAGEO"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="Protects PA0 if a jumper or adapter TX lands on the DBG_TX pin"/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>0d629ec0-dc7e-5a50-abf4-3c959df009f8</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U3">
+      <value>SFH617A-3</value>
+      <footprint>Package_DIP:DIP-4_W7.62mm</footprint>
+      <datasheet>http://www.vishay.com/docs/83740/sfh617a.pdf</datasheet>
+      <fields>
+        <field name="MPN">SFH617A-3</field>
+        <field name="Manufacturer">Vishay</field>
+        <field name="Assembly">HAND_THT</field>
+        <field name="DesignNote">CTR 100-200% @10 mA, &gt;=34% @1 mA. Isolation: ILL side never touches board GND</field>
+        <field name="Footprint">Package_DIP:DIP-4_W7.62mm</field>
+        <field name="Datasheet">http://www.vishay.com/docs/83740/sfh617a.pdf</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Kenwood_Proxy" part="Isolator_SFH617A-3" description="Optocoupler, Phototransistor Output, 5300 VRMS, VCEO 70V, CTR% 100-200, -55 to +110 degree Celsius, UL, BSI, FIMKO, THT PDIP-4"/>
+      <property name="MPN" value="SFH617A-3"/>
+      <property name="Manufacturer" value="Vishay"/>
+      <property name="Assembly" value="HAND_THT"/>
+      <property name="DesignNote" value="CTR 100-200% @10 mA, &gt;=34% @1 mA. Isolation: ILL side never touches board GND"/>
+      <property name="Sheetname" value="03  ILL input and programming header"/>
+      <property name="Sheetfile" value="03_ill_prog.kicad_sch"/>
+      <property name="ki_keywords" value="Optocoupler, Phototransistor Output, 5300 VRMS, VCEO 70V, CTR% 100-200"/>
+      <property name="ki_fp_filters" value="DIP*W7.62mm*"/>
+      <sheetpath names="/03  ILL input and programming header/" tstamps="/63202396-956d-54ca-b041-a3ad35d4a377/"/>
+      <tstamps>1b5f4f97-df11-53f7-b68f-02d267d6c60b</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="4"/>
+            <pin num="3"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Kenwood_Proxy" part="Connector_Generic_Conn_01x02">
+      <description>Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x02</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Connector_Generic_Conn_01x03">
+      <description>Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x03</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+        <pin num="3" name="Pin_3" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Connector_Generic_Conn_01x04">
+      <description>Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x04</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+        <pin num="3" name="Pin_3" type="passive"/>
+        <pin num="4" name="Pin_4" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Connector_TestPoint">
+      <description>test point</description>
+      <footprints>
+        <fp>Pin*</fp>
+        <fp>Test*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">TP</field>
+        <field name="Value">TestPoint</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">test point</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Device_C">
+      <description>Unpolarized capacitor</description>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Unpolarized capacitor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Device_C_Polarized">
+      <description>Polarized capacitor</description>
+      <footprints>
+        <fp>CP_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C_Polarized</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Polarized capacitor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Device_Crystal">
+      <description>Two pin crystal</description>
+      <footprints>
+        <fp>Crystal*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">Y</field>
+        <field name="Value">Crystal</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Two pin crystal</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Device_R">
+      <description>Resistor</description>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Diode_1N4148">
+      <description>100V 0.15A standard switching diode, DO-35</description>
+      <docs>https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf</docs>
+      <footprints>
+        <fp>D*DO?35*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">1N4148</field>
+        <field name="Footprint">Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal</field>
+        <field name="Datasheet">https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf</field>
+        <field name="Description">100V 0.15A standard switching diode, DO-35</field>
+        <field name="Sim.Device">D</field>
+        <field name="Sim.Pins">1=K 2=A</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Isolator_SFH617A-3">
+      <description>Optocoupler, Phototransistor Output, 5300 VRMS, VCEO 70V, CTR% 100-200, -55 to +110 degree Celsius, UL, BSI, FIMKO, THT PDIP-4</description>
+      <docs>http://www.vishay.com/docs/83740/sfh617a.pdf</docs>
+      <footprints>
+        <fp>DIP*W7.62mm*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">SFH617A-3</field>
+        <field name="Footprint">Package_DIP:DIP-4_W7.62mm</field>
+        <field name="Datasheet">http://www.vishay.com/docs/83740/sfh617a.pdf</field>
+        <field name="Description">Optocoupler, Phototransistor Output, 5300 VRMS, VCEO 70V, CTR% 100-200, -55 to +110 degree Celsius, UL, BSI, FIMKO, THT PDIP-4</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+        <pin num="3" name="" type="passive"/>
+        <pin num="4" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="MCU_Microchip_AVR_Dx_AVR128DB28x-xSP">
+      <description>24MHz, 128kB Flash, 16kB SRAM, EEPROM with Op Amps and Multi-Voltage I/O, SPDIP-28</description>
+      <docs>https://ww1.microchip.com/downloads/en/DeviceDoc/AVR128DB28-32-48-64-DataSheet-DS40002247A.pdf</docs>
+      <footprints>
+        <fp>DIP*W7.62mm*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">AVR128DB28x-xSP</field>
+        <field name="Footprint">Package_DIP:DIP-28_W7.62mm</field>
+        <field name="Datasheet">https://ww1.microchip.com/downloads/en/DeviceDoc/AVR128DB28-32-48-64-DataSheet-DS40002247A.pdf</field>
+        <field name="Description">24MHz, 128kB Flash, 16kB SRAM, EEPROM with Op Amps and Multi-Voltage I/O, SPDIP-28</field>
+      </fields>
+      <pins>
+        <pin num="1" name="PA7" type="bidirectional"/>
+        <pin num="2" name="PC0" type="bidirectional"/>
+        <pin num="3" name="PC1" type="bidirectional"/>
+        <pin num="4" name="PC2" type="bidirectional"/>
+        <pin num="5" name="PC3" type="bidirectional"/>
+        <pin num="6" name="VDDIO2" type="power_in"/>
+        <pin num="7" name="PD1" type="bidirectional"/>
+        <pin num="8" name="PD2" type="bidirectional"/>
+        <pin num="9" name="PD3" type="bidirectional"/>
+        <pin num="10" name="PD4" type="bidirectional"/>
+        <pin num="11" name="PD5" type="bidirectional"/>
+        <pin num="12" name="PD6" type="bidirectional"/>
+        <pin num="13" name="VREFA/PD7" type="bidirectional"/>
+        <pin num="14" name="AVDD" type="power_in"/>
+        <pin num="15" name="AGND" type="power_in"/>
+        <pin num="16" name="XTAL32K1/PF0" type="bidirectional"/>
+        <pin num="17" name="XTAL32K2/PF1" type="bidirectional"/>
+        <pin num="18" name="~{RESET}/PF6" type="bidirectional"/>
+        <pin num="19" name="UPDI" type="input"/>
+        <pin num="20" name="VDD" type="power_in"/>
+        <pin num="21" name="GND" type="power_in"/>
+        <pin num="22" name="XTALHF1/PA0" type="bidirectional"/>
+        <pin num="23" name="XTALHF2/PA1" type="bidirectional"/>
+        <pin num="24" name="PA2" type="bidirectional"/>
+        <pin num="25" name="PA3" type="bidirectional"/>
+        <pin num="26" name="PA4" type="bidirectional"/>
+        <pin num="27" name="PA5" type="bidirectional"/>
+        <pin num="28" name="PA6" type="bidirectional"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Mechanical_MountingHole">
+      <description>Mounting Hole without connection</description>
+      <footprints>
+        <fp>MountingHole*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">H</field>
+        <field name="Value">MountingHole</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Mounting Hole without connection</field>
+      </fields>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="Regulator_Linear_LM2936-5.0_TO92">
+      <description>50mA Ultra-Low Quiescent Current LDO Voltage Regulator, 5.0V fixed output, TO-92</description>
+      <docs>http://www.ti.com/lit/ds/symlink/lm2936.pdf</docs>
+      <footprints>
+        <fp>TO?92*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">LM2936-5.0_TO92</field>
+        <field name="Footprint">Package_TO_SOT_THT:TO-92_Inline</field>
+        <field name="Datasheet">http://www.ti.com/lit/ds/symlink/lm2936.pdf</field>
+        <field name="Description">50mA Ultra-Low Quiescent Current LDO Voltage Regulator, 5.0V fixed output, TO-92</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VO" type="power_out"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="VI" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="Kenwood_Proxy" part="WR-MJ_4P4C_TabUp">
+      <description>Wurth 615004143821 4P4C. Manufacturer numbering: looking into mating face, tab up, contacts 4,3,2,1 left to right.</description>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">WR-MJ_4P4C_TabUp</field>
+        <field name="Footprint">Kenwood_Proxy:Wurth_615004143821_4P4C_TabUp</field>
+        <field name="Datasheet"/>
+        <field name="Description">Wurth 615004143821 4P4C. Manufacturer numbering: looking into mating face, tab up, contacts 4,3,2,1 left to right.</field>
+      </fields>
+      <pins>
+        <pin num="1" name="PB" type="passive"/>
+        <pin num="2" name="GND" type="passive"/>
+        <pin num="3" name="DATA_body-to-head" type="passive"/>
+        <pin num="4" name="DATA_head-to-body" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Kenwood_Proxy">
+      <uri>${KIPRJMOD}/Kenwood_Proxy.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="+5V" class="Default">
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="C2" pin="1" pintype="passive"/>
+      <node ref="C3" pin="1" pintype="passive"/>
+      <node ref="C4" pin="1" pintype="passive"/>
+      <node ref="R11" pin="1" pintype="passive"/>
+      <node ref="U1" pin="14" pinfunction="AVDD_14" pintype="power_in"/>
+      <node ref="U1" pin="20" pinfunction="VDD_20" pintype="power_in"/>
+      <node ref="U1" pin="6" pinfunction="VDDIO2_6" pintype="power_in"/>
+      <node ref="U2" pin="1" pinfunction="VO_1" pintype="power_out"/>
+    </net>
+    <net code="2" name="BODY_TXD" class="Default">
+      <node ref="J1" pin="3" pinfunction="DATA_body-to-head_3" pintype="passive"/>
+      <node ref="JP1" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="R6" pin="1" pintype="passive"/>
+    </net>
+    <net code="3" name="DBG_TX" class="Default">
+      <node ref="J4" pin="3" pinfunction="Pin_3_3" pintype="passive"/>
+      <node ref="R13" pin="2" pintype="passive"/>
+    </net>
+    <net code="4" name="DBG_TX_MCU" class="Default">
+      <node ref="R13" pin="1" pintype="passive"/>
+      <node ref="U1" pin="22" pinfunction="XTALHF1/PA0_22" pintype="bidirectional"/>
+    </net>
+    <net code="5" name="GND" class="Default">
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="C2" pin="2" pintype="passive"/>
+      <node ref="C3" pin="2" pintype="passive"/>
+      <node ref="C4" pin="2" pintype="passive"/>
+      <node ref="C5" pin="2" pintype="passive"/>
+      <node ref="C6" pin="2" pintype="passive"/>
+      <node ref="C7" pin="2" pintype="passive"/>
+      <node ref="C8" pin="2" pintype="passive"/>
+      <node ref="J1" pin="2" pinfunction="GND_2" pintype="passive"/>
+      <node ref="J2" pin="2" pinfunction="GND_2" pintype="passive"/>
+      <node ref="J4" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="J5" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="TP2" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="U1" pin="15" pinfunction="AGND_15" pintype="power_in"/>
+      <node ref="U1" pin="21" pinfunction="GND_21" pintype="power_in"/>
+      <node ref="U2" pin="2" pinfunction="GND_2" pintype="power_in"/>
+      <node ref="U3" pin="3" pintype="passive"/>
+    </net>
+    <net code="6" name="HEAD_RXD" class="Default">
+      <node ref="J2" pin="3" pinfunction="DATA_body-to-head_3" pintype="passive"/>
+      <node ref="J5" pin="4" pinfunction="Pin_4_4" pintype="passive"/>
+      <node ref="JP1" pin="2" pinfunction="Pin_2_2" pintype="passive"/>
+      <node ref="R2" pin="2" pintype="passive"/>
+    </net>
+    <net code="7" name="HEAD_TXD" class="Default">
+      <node ref="J1" pin="4" pinfunction="DATA_head-to-body_4" pintype="passive"/>
+      <node ref="J2" pin="4" pinfunction="DATA_head-to-body_4" pintype="passive"/>
+      <node ref="R7" pin="1" pintype="passive"/>
+    </net>
+    <net code="8" name="HEAD_TX_MCU" class="Default">
+      <node ref="R2" pin="1" pintype="passive"/>
+      <node ref="U1" pin="2" pinfunction="PC0_2" pintype="bidirectional"/>
+    </net>
+    <net code="9" name="ILL_GND" class="Default">
+      <node ref="D1" pin="2" pinfunction="A_2" pintype="passive"/>
+      <node ref="J3" pin="2" pinfunction="Pin_2_2" pintype="passive"/>
+      <node ref="R10" pin="2" pintype="passive"/>
+      <node ref="U3" pin="2" pintype="passive"/>
+    </net>
+    <net code="10" name="ILL_LED_A" class="Default">
+      <node ref="D1" pin="1" pinfunction="K_1" pintype="passive"/>
+      <node ref="R10" pin="1" pintype="passive"/>
+      <node ref="R9" pin="2" pintype="passive"/>
+      <node ref="U3" pin="1" pintype="passive"/>
+    </net>
+    <net code="11" name="ILL_P" class="Default">
+      <node ref="J3" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="R9" pin="1" pintype="passive"/>
+    </net>
+    <net code="12" name="ILL_SENSE" class="Default">
+      <node ref="R11" pin="2" pintype="passive"/>
+      <node ref="U1" pin="7" pinfunction="PD1_7" pintype="bidirectional"/>
+      <node ref="U3" pin="4" pintype="passive"/>
+    </net>
+    <net code="13" name="PB" class="Default">
+      <node ref="J1" pin="1" pinfunction="PB_1" pintype="passive"/>
+      <node ref="J2" pin="1" pinfunction="PB_1" pintype="passive"/>
+      <node ref="R1" pin="1" pintype="passive"/>
+    </net>
+    <net code="14" name="PB_FILT" class="Default">
+      <node ref="C5" pin="1" pintype="passive"/>
+      <node ref="C6" pin="1" pintype="passive"/>
+      <node ref="R1" pin="2" pintype="passive"/>
+      <node ref="U2" pin="3" pinfunction="VI_3" pintype="power_in"/>
+    </net>
+    <net code="15" name="TAP_BODY" class="Default">
+      <node ref="J5" pin="2" pinfunction="Pin_2_2" pintype="passive"/>
+      <node ref="R6" pin="2" pintype="passive"/>
+      <node ref="U1" pin="23" pinfunction="XTALHF2/PA1_23" pintype="bidirectional"/>
+    </net>
+    <net code="16" name="TAP_HEAD" class="Default">
+      <node ref="J5" pin="3" pinfunction="Pin_3_3" pintype="passive"/>
+      <node ref="R7" pin="2" pintype="passive"/>
+      <node ref="U1" pin="3" pinfunction="PC1_3" pintype="bidirectional"/>
+    </net>
+    <net code="17" name="UPDI" class="Default">
+      <node ref="J4" pin="2" pinfunction="Pin_2_2" pintype="passive"/>
+      <node ref="U1" pin="19" pinfunction="UPDI_19" pintype="input"/>
+    </net>
+    <net code="18" name="XTAL32K1" class="Default">
+      <node ref="C7" pin="1" pintype="passive"/>
+      <node ref="U1" pin="16" pinfunction="XTAL32K1/PF0_16" pintype="bidirectional"/>
+      <node ref="Y1" pin="1" pinfunction="1_1" pintype="passive"/>
+    </net>
+    <net code="19" name="XTAL32K2" class="Default">
+      <node ref="C8" pin="1" pintype="passive"/>
+      <node ref="U1" pin="17" pinfunction="XTAL32K2/PF1_17" pintype="bidirectional"/>
+      <node ref="Y1" pin="2" pinfunction="2_2" pintype="passive"/>
+    </net>
+    <net code="20" name="unconnected-(U1-PA2-Pad24)" class="Default">
+      <node ref="U1" pin="24" pinfunction="PA2_24" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="21" name="unconnected-(U1-PA3-Pad25)" class="Default">
+      <node ref="U1" pin="25" pinfunction="PA3_25" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="22" name="unconnected-(U1-PA4-Pad26)" class="Default">
+      <node ref="U1" pin="26" pinfunction="PA4_26" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="23" name="unconnected-(U1-PA5-Pad27)" class="Default">
+      <node ref="U1" pin="27" pinfunction="PA5_27" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="24" name="unconnected-(U1-PA6-Pad28)" class="Default">
+      <node ref="U1" pin="28" pinfunction="PA6_28" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="25" name="unconnected-(U1-PA7-Pad1)" class="Default">
+      <node ref="U1" pin="1" pinfunction="PA7_1" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="26" name="unconnected-(U1-PC2-Pad4)" class="Default">
+      <node ref="U1" pin="4" pinfunction="PC2_4" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="27" name="unconnected-(U1-PC3-Pad5)" class="Default">
+      <node ref="U1" pin="5" pinfunction="PC3_5" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="28" name="unconnected-(U1-PD2-Pad8)" class="Default">
+      <node ref="U1" pin="8" pinfunction="PD2_8" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="29" name="unconnected-(U1-PD3-Pad9)" class="Default">
+      <node ref="U1" pin="9" pinfunction="PD3_9" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="30" name="unconnected-(U1-PD4-Pad10)" class="Default">
+      <node ref="U1" pin="10" pinfunction="PD4_10" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="31" name="unconnected-(U1-PD5-Pad11)" class="Default">
+      <node ref="U1" pin="11" pinfunction="PD5_11" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="32" name="unconnected-(U1-PD6-Pad12)" class="Default">
+      <node ref="U1" pin="12" pinfunction="PD6_12" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="33" name="unconnected-(U1-VREFA/PD7-Pad13)" class="Default">
+      <node ref="U1" pin="13" pinfunction="VREFA/PD7_13" pintype="bidirectional+no_connect"/>
+    </net>
+    <net code="34" name="unconnected-(U1-~{RESET}/PF6-Pad18)" class="Default">
+      <node ref="U1" pin="18" pinfunction="~{RESET}/PF6_18" pintype="bidirectional+no_connect"/>
+    </net>
+  </nets>
+</export>

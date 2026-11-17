@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 500" width="860" role="img" aria-label="Block diagram: radio body, proxy board and control head">
+<style>
+  :root { --fg:#1f2328; --mute:#59636e; --box:#f6f8fa; --edge:#d0d7de; --board:#efe9f7; --bedge:#8a6fb5;
+          --data:#0969da; --pass:#1a7f37; --pwr:#bc4c00; --ill:#8250df; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fg:#e6edf3; --mute:#9198a1; --box:#161b22; --edge:#3d444d; --board:#221a30; --bedge:#a58bd6;
+            --data:#4493f8; --pass:#3fb950; --pwr:#f0883e; --ill:#ab7df8; }
+  }
+  text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: var(--fg); }
+  .t { font-size: 15px; font-weight: 600; }
+  .s { font-size: 12.5px; fill: var(--mute); }
+  .lab { font-size: 12.5px; font-weight: 600; }
+  .box { fill: var(--box); stroke: var(--edge); stroke-width: 1.5; }
+  .board { fill: var(--board); stroke: var(--bedge); stroke-width: 2; }
+  .blk { fill: var(--box); stroke: var(--bedge); stroke-width: 1.5; }
+  .data { stroke: var(--data); stroke-width: 2.5; fill: none; }
+  .pass { stroke: var(--pass); stroke-width: 2.5; fill: none; }
+  .pwr  { stroke: var(--pwr); stroke-width: 2.5; fill: none; }
+  .ill  { stroke: var(--ill); stroke-width: 2.5; fill: none; }
+  .byp  { stroke: var(--mute); stroke-width: 1.8; fill: none; stroke-dasharray: 6 5; }
+  .ad { fill: var(--data); } .ap { fill: var(--pass); } .ai { fill: var(--ill); } .aw { fill: var(--pwr); }
+</style>
+<defs>
+  <marker id="md" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="ad"/></marker>
+  <marker id="mp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="ap"/></marker>
+  <marker id="mi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="ai"/></marker>
+  <marker id="mw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="aw"/></marker>
+</defs>
+
+<!-- radio body and head -->
+<rect class="box" x="10" y="70" width="130" height="250" rx="10"/>
+<text class="t" x="75" y="185" text-anchor="middle">TM-V71A</text>
+<text class="t" x="75" y="205" text-anchor="middle">body</text>
+<rect class="box" x="720" y="70" width="130" height="250" rx="10"/>
+<text class="t" x="785" y="185" text-anchor="middle">control</text>
+<text class="t" x="785" y="205" text-anchor="middle">head</text>
+
+<!-- board -->
+<rect class="board" x="190" y="20" width="480" height="410" rx="12"/>
+<text class="t" x="430" y="44" text-anchor="middle">proxy board</text>
+<text class="s" x="214" y="80">J1 BODY</text>
+<text class="s" x="646" y="80" text-anchor="end">J2 HEAD</text>
+
+<!-- PB / GND -->
+<path class="pwr" d="M140 105 H720"/>
+<text class="lab" x="430" y="98" text-anchor="middle">pin 1 PB (~10 V) · pin 2 GND, straight through</text>
+
+<!-- pin 4 head -> body -->
+<path class="pass" d="M720 150 H140" marker-end="url(#mp)"/>
+<text class="lab" x="430" y="143" text-anchor="middle">pin 4 · head → body (keys), straight through</text>
+
+<!-- pin 3 body -> AVR -> head -->
+<rect class="blk" x="350" y="200" width="160" height="78" rx="8"/>
+<text class="t" x="430" y="232" text-anchor="middle">AVR128DB28</text>
+<text class="s" x="430" y="252" text-anchor="middle">rewrites brightness</text>
+<text class="s" x="430" y="268" text-anchor="middle">messages</text>
+<path class="data" d="M140 238 H350" marker-end="url(#md)"/>
+<path class="data" d="M510 238 H720" marker-end="url(#md)"/>
+<text class="lab" x="268" y="230" text-anchor="middle">pin 3 · body → head</text>
+<text class="s" x="268" y="256" text-anchor="middle">display data, via R6</text>
+<text class="lab" x="615" y="230" text-anchor="middle">pin 3 · to head</text>
+<text class="s" x="615" y="256" text-anchor="middle">via R2 470 Ω</text>
+
+<!-- JP1 bypass -->
+<path class="byp" d="M336 238 V300 H524 V238"/>
+<text class="s" x="430" y="318" text-anchor="middle">JP1 bypass (only with the AVR removed)</text>
+
+<!-- ILL input -->
+<rect class="blk" x="560" y="350" width="96" height="56" rx="8"/>
+<text class="lab" x="608" y="374" text-anchor="middle">opto</text>
+<text class="s" x="608" y="392" text-anchor="middle">isolated</text>
+<path class="ill" d="M608 488 V406" marker-end="url(#mi)"/>
+<text class="lab" x="620" y="462">J3 · vehicle ILL+</text>
+<text class="s" x="620" y="480">lights on = 11–14 V</text>
+<path class="ill" d="M560 378 H470 V278" marker-end="url(#mi)"/>
+<text class="s" x="476" y="342">lights on/off</text>
+
+<!-- power -->
+<rect class="blk" x="214" y="350" width="140" height="56" rx="8"/>
+<text class="lab" x="284" y="374" text-anchor="middle">R1 + 5 V LDO</text>
+<text class="s" x="284" y="392" text-anchor="middle">from PB, ~5 mA</text>
+<path class="pwr" d="M200 105 V378 H214"/>
+<path class="pwr" d="M354 378 H400 V278" marker-end="url(#mw)"/>
+</svg>

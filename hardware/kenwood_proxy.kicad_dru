@@ -1,0 +1,11 @@
+(version 1)
+# Isolated Toyota ILL+/chassis-ground circuit: keep >= 2.0 mm from all board copper (functional isolation, 12-14 V).
+(rule "ILL_P isolation"
+  (constraint clearance (min 2.0mm))
+  (condition "A.NetName == 'ILL_P' && B.NetName != 'ILL_GND' && B.NetName != 'ILL_LED_A' && B.NetName != 'ILL_P'"))
+(rule "ILL_GND isolation"
+  (constraint clearance (min 2.0mm))
+  (condition "A.NetName == 'ILL_GND' && B.NetName != 'ILL_P' && B.NetName != 'ILL_LED_A' && B.NetName != 'ILL_GND'"))
+(rule "ILL_LED_A isolation"
+  (constraint clearance (min 2.0mm))
+  (condition "A.NetName == 'ILL_LED_A' && B.NetName != 'ILL_P' && B.NetName != 'ILL_GND' && B.NetName != 'ILL_LED_A'"))

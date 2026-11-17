@@ -1,0 +1,812 @@
+{
+  "J1": {
+    "symbol": "WR-MJ_4P4C_TabUp",
+    "value": "KENWOOD BODY",
+    "footprint": "Kenwood_Proxy:Wurth_615004143821_4P4C_TabUp",
+    "mpn": "615004143821",
+    "manufacturer": "Wurth Elektronik",
+    "fit": true,
+    "note": "Cable from radio body (already 4P4C). Pin 3 = body TX (measured), pin 4 = body RX, 2 = GND, 1 = PB",
+    "assembly": "HAND_THT",
+    "sheet": "01_radio_link",
+    "pins": {
+      "1": {
+        "name": "PB",
+        "net": "PB"
+      },
+      "2": {
+        "name": "GND",
+        "net": "GND"
+      },
+      "3": {
+        "name": "DATA_body-to-head",
+        "net": "BODY_TXD"
+      },
+      "4": {
+        "name": "DATA_head-to-body",
+        "net": "HEAD_TXD"
+      }
+    }
+  },
+  "J2": {
+    "symbol": "WR-MJ_4P4C_TabUp",
+    "value": "KENWOOD HEAD",
+    "footprint": "Kenwood_Proxy:Wurth_615004143821_4P4C_TabUp",
+    "mpn": "615004143821",
+    "manufacturer": "Wurth Elektronik",
+    "fit": true,
+    "note": "Straight-through cable to control head. Identical pinout to J1",
+    "assembly": "HAND_THT",
+    "sheet": "01_radio_link",
+    "pins": {
+      "1": {
+        "name": "PB",
+        "net": "PB"
+      },
+      "2": {
+        "name": "GND",
+        "net": "GND"
+      },
+      "3": {
+        "name": "DATA_body-to-head",
+        "net": "HEAD_RXD"
+      },
+      "4": {
+        "name": "DATA_head-to-body",
+        "net": "HEAD_TXD"
+      }
+    }
+  },
+  "R2": {
+    "symbol": "Device_R",
+    "value": "470R",
+    "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal",
+    "mpn": "MFR-25FBF52-470R",
+    "manufacturer": "YAGEO",
+    "fit": true,
+    "note": "MCU USART1 TX -> head RX series resistor: limits current into head input clamps and into the body driver if JP1 is fitted with U1 present (<=3.5 mA)",
+    "assembly": "HAND_THT",
+    "sheet": "01_radio_link",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "HEAD_TX_MCU"
+      },
+      "2": {
+        "name": "",
+        "net": "HEAD_RXD"
+      }
+    }
+  },
+  "JP1": {
+    "symbol": "Connector_Generic_Conn_01x02",
+    "value": "HARD BYPASS",
+    "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+    "mpn": "TSW-102-07-G-S",
+    "manufacturer": "Samtec",
+    "fit": true,
+    "note": "Leave OPEN normally. Recovery only: remove U1 AND fit shunt -> direct copper body->head. Shunt is separate accessory SNT-100-BK-G",
+    "assembly": "HAND_THT",
+    "sheet": "01_radio_link",
+    "pins": {
+      "1": {
+        "name": "Pin_1",
+        "net": "BODY_TXD"
+      },
+      "2": {
+        "name": "Pin_2",
+        "net": "HEAD_RXD"
+      }
+    }
+  },
+  "R6": {
+    "symbol": "Device_R",
+    "value": "10k",
+    "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal",
+    "mpn": "MFR-25FBF52-10K",
+    "manufacturer": "YAGEO",
+    "fit": true,
+    "note": "MCU USART0 RX tap on the body stream; limits clamp current when U1 is unpowered",
+    "assembly": "HAND_THT",
+    "sheet": "01_radio_link",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "BODY_TXD"
+      },
+      "2": {
+        "name": "",
+        "net": "TAP_BODY"
+      }
+    }
+  },
+  "R7": {
+    "symbol": "Device_R",
+    "value": "10k",
+    "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal",
+    "mpn": "MFR-25FBF52-10K",
+    "manufacturer": "YAGEO",
+    "fit": true,
+    "note": "MCU USART1 RX tap on the head stream (logging); limits clamp current when U1 is unpowered",
+    "assembly": "HAND_THT",
+    "sheet": "01_radio_link",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "HEAD_TXD"
+      },
+      "2": {
+        "name": "",
+        "net": "TAP_HEAD"
+      }
+    }
+  },
+  "J5": {
+    "symbol": "Connector_Generic_Conn_01x04",
+    "value": "DATA TAPS",
+    "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+    "mpn": "PRPC040SAAN-RC",
+    "manufacturer": "Sullins",
+    "fit": true,
+    "note": "Bench/test taps for a logic analyzer or USB-serial RX: 1 GND, 2 body->head (via R6 10k), 3 head->body (via R7 10k), 4 what the head receives (after R2 470R). Snapped from the 40-pin strip. Listen only: never connect an adapter TX or power",
+    "assembly": "HAND_THT",
+    "sheet": "01_radio_link",
+    "pins": {
+      "1": {
+        "name": "Pin_1",
+        "net": "GND"
+      },
+      "2": {
+        "name": "Pin_2",
+        "net": "TAP_BODY"
+      },
+      "3": {
+        "name": "Pin_3",
+        "net": "TAP_HEAD"
+      },
+      "4": {
+        "name": "Pin_4",
+        "net": "HEAD_RXD"
+      }
+    }
+  },
+  "R1": {
+    "symbol": "Device_R",
+    "value": "150R 1W",
+    "footprint": "Resistor_THT:R_Axial_DIN0414_L11.9mm_D4.5mm_P15.24mm_Horizontal",
+    "mpn": "FMP100JR-52-150R",
+    "manufacturer": "YAGEO",
+    "fit": true,
+    "note": "5%, 1 W flameproof. Limits PB fault current (~67 mA into a short), RC-isolates MCU noise from PB, and doubles as board-current sense (V/150)",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "PB"
+      },
+      "2": {
+        "name": "",
+        "net": "PB_FILT"
+      }
+    }
+  },
+  "C6": {
+    "symbol": "Device_C_Polarized",
+    "value": "10uF 25V 105C",
+    "footprint": "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm",
+    "mpn": "EEA-FC1E100",
+    "manufacturer": "Panasonic",
+    "fit": true,
+    "note": "Radial aluminium, 105 C (behind the dash). EEA-FC1E100 is 4x7 mm with 1.5 mm lead pitch: spread the leads slightly into this 5 mm / 2.0 mm footprint. Any 10 uF >=25 V 105 C radial, 4-5 mm dia. 150R x 10uF ~ 106 Hz corner",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "PB_FILT"
+      },
+      "2": {
+        "name": "",
+        "net": "GND"
+      }
+    }
+  },
+  "C5": {
+    "symbol": "Device_C",
+    "value": "100nF 50V X7R",
+    "footprint": "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm",
+    "mpn": "C320C104K5R5TA",
+    "manufacturer": "KEMET",
+    "fit": true,
+    "note": "",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "PB_FILT"
+      },
+      "2": {
+        "name": "",
+        "net": "GND"
+      }
+    }
+  },
+  "U2": {
+    "symbol": "Regulator_Linear_LM2936-5.0_TO92",
+    "value": "LM2936Z-5.0",
+    "footprint": "Package_TO_SOT_THT:TO-92_Inline_Wide",
+    "mpn": "LM2936Z-5.0/NOPB",
+    "manufacturer": "Texas Instruments",
+    "fit": true,
+    "note": "TO-92 1=OUT 2=GND 3=IN. 40 V operating, 15 uA Iq. COUT >= 10 uF with 0.3-8 ohm ESR. Drop-in alt (same pinout): Diodes AP7381-50V-A",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "VO",
+        "net": "+5V"
+      },
+      "2": {
+        "name": "GND",
+        "net": "GND"
+      },
+      "3": {
+        "name": "VI",
+        "net": "PB_FILT"
+      }
+    }
+  },
+  "C4": {
+    "symbol": "Device_C_Polarized",
+    "value": "22uF 16V tantalum",
+    "footprint": "Capacitor_THT:CP_Radial_Tantal_D6.0mm_P2.50mm",
+    "mpn": "T350F226K016AT",
+    "manufacturer": "KEMET",
+    "fit": true,
+    "note": "Dipped tantalum, 6.0 mm dia, 2.54 mm pitch; ESR within LM2936 0.3-8 ohm stability window (also fine for alt U2 AP7381-50V-A)",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "+5V"
+      },
+      "2": {
+        "name": "",
+        "net": "GND"
+      }
+    }
+  },
+  "TP2": {
+    "symbol": "Connector_TestPoint",
+    "value": "GND",
+    "footprint": "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm",
+    "mpn": "",
+    "manufacturer": "",
+    "fit": true,
+    "note": "Bare plated test pad (2.0 mm, 1.0 mm hole): probe, hook or solder a wire. No purchased part",
+    "assembly": "PCB_FEATURE",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "1",
+        "net": "GND"
+      }
+    }
+  },
+  "#FLG1": {
+    "symbol": "power_PWR_FLAG",
+    "value": "PWR_FLAG",
+    "footprint": "",
+    "mpn": "",
+    "manufacturer": "",
+    "fit": true,
+    "note": "",
+    "assembly": "NONE",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "PB_FILT"
+      }
+    }
+  },
+  "#FLG2": {
+    "symbol": "power_PWR_FLAG",
+    "value": "PWR_FLAG",
+    "footprint": "",
+    "mpn": "",
+    "manufacturer": "",
+    "fit": true,
+    "note": "",
+    "assembly": "NONE",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "GND"
+      }
+    }
+  },
+  "U1": {
+    "symbol": "MCU_Microchip_AVR_Dx_AVR128DB28x-xSP",
+    "value": "AVR128DB28-I/SP",
+    "footprint": "Package_DIP:DIP-28_W7.62mm_Socket",
+    "mpn": "AVR128DB28-I/SP",
+    "manufacturer": "Microchip",
+    "fit": true,
+    "note": "Socketed SPDIP-28. 5 V, internal OSCHF auto-tuned to XOSC32K",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "PA7",
+        "net": null
+      },
+      "2": {
+        "name": "PC0",
+        "net": "HEAD_TX_MCU"
+      },
+      "3": {
+        "name": "PC1",
+        "net": "TAP_HEAD"
+      },
+      "4": {
+        "name": "PC2",
+        "net": null
+      },
+      "5": {
+        "name": "PC3",
+        "net": null
+      },
+      "6": {
+        "name": "VDDIO2",
+        "net": "+5V"
+      },
+      "7": {
+        "name": "PD1",
+        "net": "ILL_SENSE"
+      },
+      "8": {
+        "name": "PD2",
+        "net": null
+      },
+      "9": {
+        "name": "PD3",
+        "net": null
+      },
+      "10": {
+        "name": "PD4",
+        "net": null
+      },
+      "11": {
+        "name": "PD5",
+        "net": null
+      },
+      "12": {
+        "name": "PD6",
+        "net": null
+      },
+      "13": {
+        "name": "VREFA/PD7",
+        "net": null
+      },
+      "14": {
+        "name": "AVDD",
+        "net": "+5V"
+      },
+      "15": {
+        "name": "AGND",
+        "net": "GND"
+      },
+      "16": {
+        "name": "XTAL32K1/PF0",
+        "net": "XTAL32K1"
+      },
+      "17": {
+        "name": "XTAL32K2/PF1",
+        "net": "XTAL32K2"
+      },
+      "18": {
+        "name": "~{RESET}/PF6",
+        "net": null
+      },
+      "19": {
+        "name": "UPDI",
+        "net": "UPDI"
+      },
+      "20": {
+        "name": "VDD",
+        "net": "+5V"
+      },
+      "21": {
+        "name": "GND",
+        "net": "GND"
+      },
+      "22": {
+        "name": "XTALHF1/PA0",
+        "net": "DBG_TX_MCU"
+      },
+      "23": {
+        "name": "XTALHF2/PA1",
+        "net": "TAP_BODY"
+      },
+      "24": {
+        "name": "PA2",
+        "net": null
+      },
+      "25": {
+        "name": "PA3",
+        "net": null
+      },
+      "26": {
+        "name": "PA4",
+        "net": null
+      },
+      "27": {
+        "name": "PA5",
+        "net": null
+      },
+      "28": {
+        "name": "PA6",
+        "net": null
+      }
+    }
+  },
+  "C1": {
+    "symbol": "Device_C",
+    "value": "100nF 50V X7R",
+    "footprint": "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm",
+    "mpn": "C320C104K5R5TA",
+    "manufacturer": "KEMET",
+    "fit": true,
+    "note": "Decoupling at U1 VDD pin 20",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "+5V"
+      },
+      "2": {
+        "name": "",
+        "net": "GND"
+      }
+    }
+  },
+  "C2": {
+    "symbol": "Device_C",
+    "value": "100nF 50V X7R",
+    "footprint": "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm",
+    "mpn": "C320C104K5R5TA",
+    "manufacturer": "KEMET",
+    "fit": true,
+    "note": "Decoupling at U1 AVDD pin 14",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "+5V"
+      },
+      "2": {
+        "name": "",
+        "net": "GND"
+      }
+    }
+  },
+  "C3": {
+    "symbol": "Device_C",
+    "value": "100nF 50V X7R",
+    "footprint": "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm",
+    "mpn": "C320C104K5R5TA",
+    "manufacturer": "KEMET",
+    "fit": true,
+    "note": "Decoupling at U1 VDDIO2 pin 6",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "+5V"
+      },
+      "2": {
+        "name": "",
+        "net": "GND"
+      }
+    }
+  },
+  "Y1": {
+    "symbol": "Device_Crystal",
+    "value": "32.768kHz 12.5pF",
+    "footprint": "Crystal:Crystal_DS26_D2.0mm_L6.0mm_Horizontal",
+    "mpn": "AB26T-32.768KHZ",
+    "manufacturer": "Abracon",
+    "fit": true,
+    "note": "Through-hole long-lead variant (Rev A used AB26TRB, whose short formed leads barely reach). CL 12.5 pF, ESR 50k max (AVR XOSC32K limit 100k). Short traces, ground guard",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "1",
+        "net": "XTAL32K1"
+      },
+      "2": {
+        "name": "2",
+        "net": "XTAL32K2"
+      }
+    }
+  },
+  "C7": {
+    "symbol": "Device_C",
+    "value": "15pF C0G",
+    "footprint": "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm",
+    "mpn": "C315C150J1G5TA",
+    "manufacturer": "KEMET",
+    "fit": true,
+    "note": "Crystal load, C0G",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "XTAL32K1"
+      },
+      "2": {
+        "name": "",
+        "net": "GND"
+      }
+    }
+  },
+  "C8": {
+    "symbol": "Device_C",
+    "value": "15pF C0G",
+    "footprint": "Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm",
+    "mpn": "C315C150J1G5TA",
+    "manufacturer": "KEMET",
+    "fit": true,
+    "note": "Crystal load, C0G",
+    "assembly": "HAND_THT",
+    "sheet": "02_power_mcu",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "XTAL32K2"
+      },
+      "2": {
+        "name": "",
+        "net": "GND"
+      }
+    }
+  },
+  "J3": {
+    "symbol": "Connector_Generic_Conn_01x02",
+    "value": "ILL+ / GND",
+    "footprint": "Connector_Molex:Molex_Micro-Fit_3.0_43045-0200_2x01_P3.00mm_Horizontal",
+    "mpn": "43045-0200",
+    "manufacturer": "Molex",
+    "fit": true,
+    "note": "Micro-Fit 3.0 2-circuit dual-row right-angle header, latching. Mates with 2-circuit receptacle 43025-0200 (pre-crimped 22 AWG leads are fine). Pin1 ILL+ (TAIL, R1-10), pin2 chassis GND (e.g. stereo harness ground). Optocoupler keeps truck wiring isolated from radio GND",
+    "assembly": "HAND_THT",
+    "sheet": "03_ill_prog",
+    "pins": {
+      "1": {
+        "name": "Pin_1",
+        "net": "ILL_P"
+      },
+      "2": {
+        "name": "Pin_2",
+        "net": "ILL_GND"
+      }
+    }
+  },
+  "R9": {
+    "symbol": "Device_R",
+    "value": "2.2k",
+    "footprint": "Resistor_THT:R_Axial_DIN0309_L9.0mm_D3.2mm_P12.70mm_Horizontal",
+    "mpn": "MFR50SFTE52-2K2",
+    "manufacturer": "YAGEO",
+    "fit": true,
+    "note": "0.5 W metal film. ~5.4 mA at 13 V; 0.23 W at 24 V continuous; 40 V load-dump pulse 0.26 J/400 ms",
+    "assembly": "HAND_THT",
+    "sheet": "03_ill_prog",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "ILL_P"
+      },
+      "2": {
+        "name": "",
+        "net": "ILL_LED_A"
+      }
+    }
+  },
+  "R10": {
+    "symbol": "Device_R",
+    "value": "680R",
+    "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+    "mpn": "MFR-25FBF52-680R",
+    "manufacturer": "YAGEO",
+    "fit": true,
+    "note": "LED shunt: LED needs >~1.7 mA total input current, so leakage cannot half-turn-on the opto. Simulated",
+    "assembly": "HAND_THT",
+    "sheet": "03_ill_prog",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "ILL_LED_A"
+      },
+      "2": {
+        "name": "",
+        "net": "ILL_GND"
+      }
+    }
+  },
+  "D1": {
+    "symbol": "Diode_1N4148",
+    "value": "1N4148",
+    "footprint": "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal",
+    "mpn": "1N4148",
+    "manufacturer": "onsemi",
+    "fit": true,
+    "note": "Antiparallel LED reverse protection (K=pin1 on ILL_LED_A)",
+    "assembly": "HAND_THT",
+    "sheet": "03_ill_prog",
+    "pins": {
+      "1": {
+        "name": "K",
+        "net": "ILL_LED_A"
+      },
+      "2": {
+        "name": "A",
+        "net": "ILL_GND"
+      }
+    }
+  },
+  "U3": {
+    "symbol": "Isolator_SFH617A-3",
+    "value": "SFH617A-3",
+    "footprint": "Package_DIP:DIP-4_W7.62mm",
+    "mpn": "SFH617A-3",
+    "manufacturer": "Vishay",
+    "fit": true,
+    "note": "CTR 100-200% @10 mA, >=34% @1 mA. Isolation: ILL side never touches board GND",
+    "assembly": "HAND_THT",
+    "sheet": "03_ill_prog",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "ILL_LED_A"
+      },
+      "2": {
+        "name": "",
+        "net": "ILL_GND"
+      },
+      "3": {
+        "name": "",
+        "net": "GND"
+      },
+      "4": {
+        "name": "",
+        "net": "ILL_SENSE"
+      }
+    }
+  },
+  "R11": {
+    "symbol": "Device_R",
+    "value": "10k",
+    "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal",
+    "mpn": "MFR-25FBF52-10K",
+    "manufacturer": "YAGEO",
+    "fit": true,
+    "note": "Opto pull-up; ILL_SENSE LOW while ILL+ is on (lights on)",
+    "assembly": "HAND_THT",
+    "sheet": "03_ill_prog",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "+5V"
+      },
+      "2": {
+        "name": "",
+        "net": "ILL_SENSE"
+      }
+    }
+  },
+  "J4": {
+    "symbol": "Connector_Generic_Conn_01x03",
+    "value": "PROG/DEBUG",
+    "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical",
+    "mpn": "TSW-103-07-G-S",
+    "manufacturer": "Samtec",
+    "fit": true,
+    "note": "0.1 in header for bench programming/logging before the board goes behind the dash. UPDI Friend (or other 5 V SerialUPDI adapter): GND + UPDI. Logging: separate 5 V USB-serial RX on DBG_TX. Never connect adapter power",
+    "assembly": "HAND_THT",
+    "sheet": "03_ill_prog",
+    "pins": {
+      "1": {
+        "name": "Pin_1",
+        "net": "GND"
+      },
+      "2": {
+        "name": "Pin_2",
+        "net": "UPDI"
+      },
+      "3": {
+        "name": "Pin_3",
+        "net": "DBG_TX"
+      }
+    }
+  },
+  "R13": {
+    "symbol": "Device_R",
+    "value": "470R",
+    "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal",
+    "mpn": "MFR-25FBF52-470R",
+    "manufacturer": "YAGEO",
+    "fit": true,
+    "note": "Protects PA0 if a jumper or adapter TX lands on the DBG_TX pin",
+    "assembly": "HAND_THT",
+    "sheet": "03_ill_prog",
+    "pins": {
+      "1": {
+        "name": "",
+        "net": "DBG_TX_MCU"
+      },
+      "2": {
+        "name": "",
+        "net": "DBG_TX"
+      }
+    }
+  },
+  "H1": {
+    "symbol": "Mechanical_MountingHole",
+    "value": "M3",
+    "footprint": "MountingHole:MountingHole_3.2mm_M3",
+    "mpn": "",
+    "manufacturer": "",
+    "fit": true,
+    "note": "",
+    "assembly": "PCB_FEATURE",
+    "sheet": "03_ill_prog",
+    "pins": {}
+  },
+  "H2": {
+    "symbol": "Mechanical_MountingHole",
+    "value": "M3",
+    "footprint": "MountingHole:MountingHole_3.2mm_M3",
+    "mpn": "",
+    "manufacturer": "",
+    "fit": true,
+    "note": "",
+    "assembly": "PCB_FEATURE",
+    "sheet": "03_ill_prog",
+    "pins": {}
+  },
+  "H3": {
+    "symbol": "Mechanical_MountingHole",
+    "value": "M3",
+    "footprint": "MountingHole:MountingHole_3.2mm_M3",
+    "mpn": "",
+    "manufacturer": "",
+    "fit": true,
+    "note": "",
+    "assembly": "PCB_FEATURE",
+    "sheet": "03_ill_prog",
+    "pins": {}
+  },
+  "H4": {
+    "symbol": "Mechanical_MountingHole",
+    "value": "M3",
+    "footprint": "MountingHole:MountingHole_3.2mm_M3",
+    "mpn": "",
+    "manufacturer": "",
+    "fit": true,
+    "note": "",
+    "assembly": "PCB_FEATURE",
+    "sheet": "03_ill_prog",
+    "pins": {}
+  }
+}

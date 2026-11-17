@@ -1,0 +1,17 @@
+{
+ "status": "PASS_WITH_MODEL_LIMITATIONS",
+ "ngspice": [
+  "stdout ** ngspice-45.2 shared library",
+  "stdout ** ngspice-45.2 : Circuit level simulation program"
+ ],
+ "elapsed_s": 1250.4,
+ "netlist_sha256": "f41e61ac460c36ff470145cc2b31670d2b8ffafe3a8ed09f3d8b8788b8e0a12f",
+ "counts": {
+  "data_transients": 1536,
+  "ill_transients": 600,
+  "dc_ops": 50,
+  "power_ops": 24
+ },
+ "failure_count": 0
+}
+Counter()
