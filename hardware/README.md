@@ -11,6 +11,7 @@ The KiCad 10 project for the proxy board: a 54 × 52 mm, 2-layer, all-through-ho
 | `build_schematic.py`, `build_board.py`, `check_design.py` | Scripts that generate and check the design (see [Rebuilding](#rebuilding)) |
 | `simulation/`, [`simulation_review.md`](simulation_review.md) | ngspice checks of the interface, ILL input and power networks |
 | `footprints/`, `Kenwood_Proxy.kicad_sym` | Project footprint (4P4C jack) and symbol library |
+| `3dmodels/` | Simplified Micro-Fit (J3) model and its generator, since KiCad's library has none |
 
 **Rev B status.** Rev B is Rev A with three changes:
 - the data-line fix
@@ -74,6 +75,10 @@ Cable corners from 100 pF to 470 pF were simulated: the default installation (a 
   - GND pours on both layers, with stitching vias on a 3 mm grid.
 - **ILL isolation:** the ILL area (top right, outlined on the silkscreen) has no pour and no other tracks. `kenwood_proxy.kicad_dru` enforces at least 2.0 mm from the ILL nets to all other copper, and the layout gives about 2.5 mm.
 - **Checks:** DRC with schematic parity gives 0 violations, 0 unconnected and 0 parity errors (`checks/pcb-drc.json`). The design checks pass 25/25 (`checks/design_checks.json`).
+- **3D models:**
+  - The jacks use Würth's STEP model through `${WE_3DMODEL_DIR}`. Install [WurthElektronik/KiCad-Library](https://github.com/WurthElektronik/KiCad-Library) and set that path variable in KiCad to see them.
+  - Y1 uses KiCad's near-identical C26-LF crystal model.
+  - J3 uses `3dmodels/Molex_Micro-Fit_3.0_43045-0200_simplified.step`.
 - **Jack footprint:** matches Würth's official KiCad footprint `J_Wurth_WR-MJ_615004143821` ([WurthElektronik/KiCad-Library](https://github.com/WurthElektronik/KiCad-Library)), rotated 180° and with 1.5 mm pads.
 
 ## Rebuilding

@@ -6,7 +6,7 @@ The TM-V71A has a single display brightness setting. A level that's readable in 
 
 ![Assembled board, 3D render](docs/img/board_3d.png)
 
-*3D render of Rev B. The 4P4C jacks, the J3 header and the crystal have no 3D models, so their footprints appear empty.*
+*3D render of Rev B, seen from the connector edge. J3 (grey) is a simplified stand-in model.*
 
 ## How it works
 

@@ -23,4 +23,9 @@
 	(pad "4" thru_hole circle (at -3.06 -2.54) (size 1.5 1.5) (drill 0.9) (layers "*.Cu" "*.Mask"))
 	(pad "" np_thru_hole circle (at -6.53 2.3) (size 2.36 2.36) (drill 2.36) (layers "*.Cu" "*.Mask"))
 	(pad "" np_thru_hole circle (at 3.47 2.3) (size 2.36 2.36) (drill 2.36) (layers "*.Cu" "*.Mask"))
+	(model "${WE_3DMODEL_DIR}/Connector_THT_Wurth.3dshapes/J_Wurth_WR-MJ_615004143821.step"
+		(offset (xyz 0 0 0))
+		(scale (xyz 1 1 1))
+		(rotate (xyz 0 0 180))
+	)
 )

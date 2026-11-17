@@ -54,6 +54,13 @@ pos = {
  **{f'H{i+1}': (hx, hy, 0) for i, (hx, hy) in enumerate(HOLES)},
 }
 SILK_REFS = {'J1','J2','J3','J4','J5','JP1','U1','U2','U3','Y1'}
+# 3D models KiCad's library lacks (used by renders and the 3D viewer only).
+#   Micro-Fit 43045-0200: simplified stand-in from 3dmodels/make_microfit_model.py
+#   DS26 horizontal crystal: the near-identical C26-LF model (same pad pitch and origin)
+MODEL_OVERRIDES = {
+    'Molex_Micro-Fit_3.0_43045-0200_2x01_P3.00mm_Horizontal': '${KIPRJMOD}/3dmodels/Molex_Micro-Fit_3.0_43045-0200_simplified.step',
+    'Crystal_DS26_D2.0mm_L6.0mm_Horizontal': '${KICAD10_3DMODEL_DIR}/Crystal.3dshapes/Crystal_C26-LF_D2.1mm_L6.5mm_Horizontal.step',
+}
 
 fps = {}
 for el in xml.findall('./components/comp'):
@@ -63,6 +70,8 @@ for el in xml.findall('./components/comp'):
     libdir = BASE/'footprints'/(lib+'.pretty') if lib == 'Kenwood_Proxy' else SYS/(lib+'.pretty')
     fp = p.FootprintLoad(str(libdir), name)
     if fp is None: raise RuntimeError(c['footprint'])
+    if name in MODEL_OVERRIDES:   # replace the library's model reference
+        fp.Models().clear(); m = p.FP_3DMODEL(); m.m_Filename = MODEL_OVERRIDES[name]; fp.Add3DModel(m)
     fp.SetFPID(p.LIB_ID(lib, name)); fp.SetReference(ref); fp.SetValue(c['value'])
     for field in el.findall('./fields/field'):
         if field.attrib['name'] not in ('Reference', 'Value', 'Footprint'):
