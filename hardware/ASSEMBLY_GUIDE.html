@@ -1,0 +1,1268 @@
+<title>Kenwood Proxy Rev A Build</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>
+  // Dark is the default. A saved light choice wins; storage may be unavailable.
+  (function () {
+    var t = 'dark';
+    try { var s = localStorage.getItem('kp-guide-theme'); if (s === 'light' || s === 'dark') t = s; } catch (e) {}
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=Barlow+Semi+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one 46rem reading column, a sticky progress bar, numbered phases in build order.
+   Palette: OSH Park soldermask purple-black with ENIG gold as the accent. Dark first. */
+:root {
+  --bg: #15121c;
+  --surface: #1e1a28;
+  --surface-2: #272233;
+  --line: #3a3348;
+  --fg: #ece8f2;
+  --fg-dim: #aaa2b8;
+  --gold: #d8b45c;
+  --gold-ink: #1b1608;
+  --purple: #a98bdc;
+  --board: #2b1f45;
+  --board-edge: #6a55a0;
+  --warn: #f0a63c;
+  --warn-bg: #2e2312;
+  --stop: #f2665f;
+  --stop-bg: #331a1b;
+  --ok: #7cc68a;
+  --ok-bg: #182a1d;
+  --f-display: "Barlow Semi Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f6f4f9; --surface: #ffffff; --surface-2: #efebf5; --line: #d6cfe2;
+    --fg: #1e1828; --fg-dim: #5b5268; --gold: #8a6a12; --gold-ink: #ffffff; --purple: #5a3d99;
+    --board: #e6def5; --board-edge: #6a55a0; --warn: #9a5c00; --warn-bg: #fdf1dc;
+    --stop: #b3261e; --stop-bg: #fbe4e2; --ok: #2b7a3a; --ok-bg: #e2f3e5; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f6f4f9; --surface: #ffffff; --surface-2: #efebf5; --line: #d6cfe2;
+  --fg: #1e1828; --fg-dim: #5b5268; --gold: #8a6a12; --gold-ink: #ffffff; --purple: #5a3d99;
+  --board: #e6def5; --board-edge: #6a55a0; --warn: #9a5c00; --warn-bg: #fdf1dc;
+  --stop: #b3261e; --stop-bg: #fbe4e2; --ok: #2b7a3a; --ok-bg: #e2f3e5; color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 400 1.0625rem/1.55 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 4rem;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+main { max-width: 46rem; margin: 0 auto; display: grid; gap: 2.5rem; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: 2.3rem; letter-spacing: .005em; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.15rem; font-weight: 600; margin-top: .5rem; }
+p { margin: 0; }
+a { color: var(--purple); }
+code, .mono { font-family: var(--f-mono); font-size: .88em; }
+code { background: var(--surface-2); border: 1px solid var(--line); padding: .05em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; font-family: var(--f-mono); font-size: .82rem; line-height: 1.45; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: .8rem 1rem; overflow-x: auto; }
+pre code { background: none; border: 0; padding: 0; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* top bar */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding: .55rem max(16px, env(safe-area-inset-right, 0px)) .55rem max(16px, env(safe-area-inset-left, 0px));
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.bar-in { max-width: 46rem; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+.bar-count { font-family: var(--f-mono); font-size: .85rem; font-variant-numeric: tabular-nums; color: var(--fg-dim); white-space: nowrap; }
+.meter { flex: 1 1 8rem; height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; min-width: 6rem; }
+.meter i { display: block; height: 100%; width: 0; background: var(--gold); transition: width .2s; }
+.btn { font: 600 .85rem var(--f-body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 5px; padding: .3rem .7rem; cursor: pointer; }
+.btn:hover { border-color: var(--gold); }
+.btn.danger { color: var(--stop); border-color: var(--stop); }
+.confirm { display: flex; gap: .4rem; align-items: center; font-size: .85rem; }
+.confirm[hidden] { display: none; }
+.toc { display: flex; flex-wrap: wrap; gap: .3rem .9rem; font-size: .9rem; }
+.toc a { text-decoration: none; color: var(--fg-dim); }
+.toc a:hover { color: var(--gold); }
+
+header.top { padding-top: 1.6rem; display: grid; gap: .8rem; }
+.eyebrow { font: 600 .78rem var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+.lede { color: var(--fg-dim); max-width: 40rem; }
+
+section { display: grid; gap: 1rem; scroll-margin-top: 4.5rem; }
+.sec-head { display: flex; align-items: baseline; gap: .7rem; border-bottom: 1px solid var(--line); padding-bottom: .4rem; }
+.sec-num { font: 600 .9rem var(--f-mono); color: var(--gold); }
+.sec-head .sec-prog { margin-left: auto; font: .8rem var(--f-mono); color: var(--fg-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* steps */
+ol.steps, ul.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+li.step { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: .1rem .6rem; align-items: start; padding: .55rem .7rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+li.step > input { width: 1.2rem; height: 1.2rem; margin: .2rem 0 0; accent-color: var(--gold); cursor: pointer; grid-row: 1 / span 9; }
+li.step > .c { min-width: 0; display: grid; gap: .45rem; }
+li.step .t { font-weight: 600; cursor: pointer; }
+li.step.done { opacity: .62; }
+li.step.done .t { text-decoration: line-through; text-decoration-color: var(--fg-dim); }
+.dim { color: var(--fg-dim); }
+.small { font-size: .9rem; }
+ul.plain { margin: 0; padding-left: 1.2rem; display: grid; gap: .2rem; }
+
+/* callouts */
+.note, .warn, .stop, .expect { border-radius: 6px; padding: .55rem .75rem; display: grid; gap: .3rem; font-size: .96rem; }
+.note { background: var(--surface-2); border: 1px solid var(--line); }
+.warn { background: var(--warn-bg); border: 1px solid var(--warn); }
+.warn > b:first-child, .warn .h { color: var(--warn); }
+.stop { background: var(--stop-bg); border: 1px solid var(--stop); }
+.stop > b:first-child { color: var(--stop); }
+.expect { background: var(--ok-bg); border: 1px solid var(--ok); }
+.expect > b:first-child { color: var(--ok); font: 600 .78rem var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
+.expect table { width: 100%; }
+
+/* tables */
+.tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+th, td { text-align: left; padding: .4rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 .75rem var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-dim); background: var(--surface); }
+tr:last-child td { border-bottom: 0; }
+td.num, .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.expect td, .expect th { border-color: color-mix(in srgb, var(--ok) 35%, transparent); background: transparent; padding: .25rem .4rem; }
+
+/* map */
+figure { margin: 0; display: grid; gap: .5rem; }
+.map { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: .5rem; }
+.map svg { display: block; width: 100%; min-width: 540px; height: auto; }
+figcaption { font-size: .88rem; color: var(--fg-dim); }
+.legend { display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; font-size: .85rem; color: var(--fg-dim); }
+.sw { display: inline-block; width: .8rem; height: .8rem; vertical-align: -.1rem; margin-right: .3rem; border-radius: 2px; }
+
+svg .pcb { fill: var(--board); stroke: var(--board-edge); stroke-width: .3; }
+svg .hole { fill: var(--bg); stroke: var(--fg-dim); stroke-width: .2; }
+svg .peg { fill: none; stroke: var(--fg-dim); stroke-width: .2; stroke-dasharray: .5 .4; }
+svg .pad { fill: var(--gold); }
+svg .p1 { fill: var(--stop); }
+svg .body { fill: none; stroke: var(--fg-dim); stroke-width: .22; }
+svg .bodyf { fill: var(--surface-2); stroke: var(--fg-dim); stroke-width: .22; }
+svg .lead { stroke: var(--gold); stroke-width: .3; fill: none; opacity: .75; }
+svg .pol { fill: var(--warn); }
+svg .polline { stroke: var(--warn); stroke-width: .45; fill: none; }
+svg .hatch { fill: url(#hatch); }
+svg .zone { fill: none; stroke: var(--purple); stroke-width: .25; stroke-dasharray: 1 .6; }
+svg text { fill: var(--fg); font-family: var(--f-mono); font-size: 1.35px; }
+svg text.s { font-size: 1.05px; fill: var(--fg-dim); }
+svg text.ref { font-size: 1.3px; font-weight: 600; }
+svg text.probe { fill: var(--purple); font-weight: 600; font-size: 1.15px; }
+svg text.edge { fill: var(--fg-dim); font-size: 1.3px; letter-spacing: .05px; }
+svg .probe-dot { fill: none; stroke: var(--purple); stroke-width: .3; }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .6rem; }
+.two > * { min-width: 0; }
+kbd { font: .82em var(--f-mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: 0 .3em; background: var(--surface-2); }
+
+/* bag MPN chip on a step */
+.bag { justify-self: start; font: 600 .82rem var(--f-mono); color: var(--gold); background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: .1rem .45rem; overflow-wrap: anywhere; }
+
+/* highlighted map copies: the step's parts in full colour, everything else greyed */
+svg.hl .part { opacity: .16; transition: opacity .15s; }
+svg.hl .part.on { opacity: 1; }
+svg.hl .part.on .bodyf { fill: color-mix(in srgb, var(--gold) 24%, var(--surface-2)); stroke: var(--gold); stroke-width: .45; }
+svg.hl .part.on .body { stroke: var(--gold); stroke-width: .45; }
+svg.hl .part.on .zone { stroke: var(--gold); stroke-width: .45; }
+svg.hl .part.on text.ref { fill: var(--gold); }
+svg .ring { fill: none; stroke: var(--gold); stroke-width: .4; }
+svg text.ringlab { fill: var(--gold); font-weight: 600; font-size: 1.2px; }
+svg.wd text { font-size: 2.6px; }
+svg.wd text.s { font-size: 2.1px; fill: var(--fg-dim); }
+svg.wd text.ref { font-size: 2.5px; font-weight: 600; }
+svg.wd text.warn { fill: var(--warn); }
+svg.wd .bodyf, svg.wd .body { stroke-width: .35; }
+svg.wd .bodyf.hl { fill: color-mix(in srgb, var(--gold) 24%, var(--surface-2)); stroke: var(--gold); }
+svg.wd .lead { stroke-width: .5; }
+svg .wire { stroke: var(--fg); stroke-width: .6; fill: none; }
+svg .wire.updi { stroke: var(--gold); }
+svg .wire.gnd { stroke: var(--fg-dim); }
+svg .wire.nc { stroke-dasharray: 1 .8; stroke: var(--warn); }
+svg .xmark { stroke: var(--warn); stroke-width: .6; fill: none; }
+svg .bb { fill: none; stroke: var(--line); stroke-width: .4; stroke-dasharray: 1 .6; }
+svg .strip { stroke: var(--line); stroke-width: 2; stroke-linecap: round; }
+svg .pad.dimmed { opacity: .35; }
+.fig-slot .stepmap { max-width: 36rem; }
+.maplabel { font: 600 .74rem var(--f-mono); letter-spacing: .04em; color: var(--gold); padding: .15rem .3rem .3rem; }
+.stepmap { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: .3rem; max-width: 26rem; }
+.stepmap svg { display: block; width: 100%; min-width: 0; height: auto; }
+
+/* step-by-step view */
+.focus { position: fixed; inset: 0; z-index: 20; background: var(--bg); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.focus[hidden] { display: none; }
+.f-top, .f-bot { background: var(--surface); border-color: var(--line); border-style: solid; border-width: 0;
+  padding: .55rem max(16px, env(safe-area-inset-right, 0px)) .55rem max(16px, env(safe-area-inset-left, 0px)); }
+.f-top { border-bottom-width: 1px; padding-top: calc(.55rem + env(safe-area-inset-top, 0px)); }
+.f-bot { border-top-width: 1px; padding-bottom: calc(.55rem + env(safe-area-inset-bottom, 0px)); }
+.f-row { max-width: 64rem; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .8rem; }
+.f-sec { font: 600 .8rem var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--gold); }
+.f-pos { font: .85rem var(--f-mono); color: var(--fg-dim); font-variant-numeric: tabular-nums; }
+.f-top .btn:last-child { margin-left: auto; }
+.f-main { overflow-y: auto; padding: 1rem max(16px, env(safe-area-inset-right, 0px)) 1.5rem max(16px, env(safe-area-inset-left, 0px)); }
+.f-grid { max-width: 64rem; margin: 0 auto; display: grid; gap: 1rem 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); align-items: start; }
+.f-map { display: grid; gap: .4rem; min-width: 0; }
+.f-map[hidden] { display: none; }
+.f-map .stepmap { max-width: none; }
+.f-map .stepmap svg { max-height: 62vh; }
+.f-body { display: grid; gap: .6rem; min-width: 0; }
+.f-body .t { font: 700 1.45rem/1.2 var(--f-display); }
+.f-body.done .t { text-decoration: line-through; text-decoration-color: var(--fg-dim); }
+.f-check { display: inline-flex; align-items: center; gap: .45rem; font-weight: 600; cursor: pointer; }
+.f-check input { width: 1.2rem; height: 1.2rem; accent-color: var(--gold); }
+.f-bot .btn { padding: .45rem .9rem; font-size: .95rem; }
+@media (max-width: 40rem) { .f-bot .spacer { display: none; } .f-bot .f-row { gap: .5rem; justify-content: space-between; } .f-sec { flex-basis: 100%; } }
+.f-bot .btn.primary { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
+.f-bot .spacer { flex: 1; }
+.f-keys { font-size: .8rem; color: var(--fg-dim); }
+@media (max-width: 40rem) { .f-keys { display: none; } }
+a.stepln { color: var(--gold); font-weight: 600; }
+li.step .go { justify-self: start; font: 600 .78rem var(--f-body); color: var(--fg-dim); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+li.step .go:hover { color: var(--gold); }
+
+@media (prefers-reduced-motion: reduce) { .meter i { transition: none; } svg.hl .part { transition: none; } }
+
+@media print {
+  :root, :root[data-theme="dark"], :root[data-theme="light"] {
+    --bg: #fff; --surface: #fff; --surface-2: #f2f0f5; --line: #bbb; --fg: #000; --fg-dim: #444;
+    --gold: #7a5c00; --purple: #4a2f88; --board: #fff; --board-edge: #333; --warn: #8a5000; --warn-bg: #fff;
+    --stop: #a00; --stop-bg: #fff; --ok: #1d6b2c; --ok-bg: #fff; color-scheme: light;
+  }
+  body { font-size: 10.5pt; padding-block: 0; }
+  body::before, .bar, .toc, .noprint, .focus, li.step .go { display: none !important; }
+  main { max-width: none; gap: 1.2rem; }
+  section { break-inside: auto; }
+  li.step, .warn, .stop, .expect, figure, pre, .tw { break-inside: avoid; }
+  li.step.done { opacity: 1; }
+  .map svg { min-width: 0; }
+}
+</style>
+
+<div class="bar" role="region" aria-label="Progress">
+  <div class="bar-in">
+    <span class="bar-count" id="count">0 / 0 steps</span>
+    <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+    <button class="btn" id="focus-btn" type="button">Step by step</button>
+    <button class="btn" id="theme-btn" type="button">Light</button>
+    <span id="reset-wrap"><button class="btn" id="reset-btn" type="button">Reset progress</button></span>
+    <span id="confirm-wrap" class="confirm" hidden>Clear every tick?
+      <button class="btn danger" id="reset-yes" type="button">Clear</button>
+      <button class="btn" id="reset-no" type="button">Cancel</button></span>
+  </div>
+</div>
+
+<main>
+<header class="top">
+  <span class="eyebrow">TM-V71A head/body proxy · Rev A · 54 × 52 mm</span>
+  <h1>Kenwood Proxy Rev A Build</h1>
+  <p class="lede">Bench assembly and bring-up, in order. Tick each step as you go; ticks are saved in this browser only. The board takes its power from the radio's PB line (about 10 V), never from truck wiring. Everything is tested and flashed on the bench so the dash is opened once.</p>
+  <nav class="toc" aria-label="Sections">
+    <a href="#status">0 Where you are</a><a href="#tools">1 Tools</a><a href="#parts">2 Parts</a><a href="#map">3 Map</a><a href="#pre">4 Before soldering</a>
+    <a href="#solder">5 Soldering</a><a href="#post">6 Clean up</a><a href="#j3plug">7 J3 plug</a><a href="#tests">8 Tests (no AVR)</a>
+    <a href="#updi">9 Programmer</a><a href="#flash">10 Flash and log</a><a href="#case">11 Case</a><a href="#recovery">Recovery</a>
+  </nav>
+  <div class="note small"><span><b>Working with Claude.</b> Claude runs the <code>make</code> commands from the terminal in <code>hardware/kenwood_proxy/firmware</code>. You handle cables, the meter and the analyzer. Hand over captures, readings that look off, and the J3 height.</span></div>
+</header>
+
+
+<!-- 0 STATUS -->
+<section id="status">
+  <div class="sec-head"><span class="sec-num">0</span><h2>Where you are</h2></div>
+  <p class="small dim">Updated 2026-11-14. The build has gone out of order (programming before the radio tests, because the radio is in the truck), so this is the order for what's left. Step numbers open that step in the step-by-step view.</p>
+  <div class="expect"><b>Done</b>
+    <ul class="plain small">
+      <li>Bare-board checks, all soldering, trim, IPA clean, short checks (PB↔GND climbs to MΩ; 5 V↔GND ≈ 40 kΩ)</li>
+      <li>Bench tests A and B: 0.00 mA and 5.0 V with the AVR out; lights input switches socket pin 7</li>
+      <li>AVR fitted. Fuses set and forward-only firmware flashed and verified, programmed with the <b>FT232</b> (the CH340 modules couldn't receive)</li>
+      <li>Joints inspected. Case printed; the board fits (so J3's height is fine)</li>
+      <li>Bench log: <code>KP v1 rw=0 d=- n=- b=- d</code>, <code>X 1</code> (crystal OK), <code>M n</code> / <code>M d</code> (lights input OK)</li>
+    </ul>
+    <span class="small">Your ticks live in this browser only. <button class="btn" id="mark-done" type="button">Tick the steps confirmed done</button> <span id="mark-done-msg" class="dim small"></span></span>
+  </div>
+
+  <div class="stop"><b>Do the rework first</b><span>The radio's data lines run opposite to the Rev A design (measured 2026-11-15). Follow <a href="REWORK.html">REWORK.html</a> before any forward-mode or full-firmware test.</span></div>
+  <div class="note"><span><b>Truck session:</b> use <a href="TRUCK_TESTS.html">TRUCK_TESTS.html</a> (same folder). It has only the truck steps, in order, with its own step-by-step view.</span></div>
+  <h3>Remaining, in this order</h3>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>Where</th><th>What</th><th>Steps</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Truck</td><td><b>AVR stays in</b> (forward-only firmware), JP1 <b>parked</b>. Body cable only, radio on: measure J2's pins. Expect pin 1 ≈ 10 V, pin 2 0 V, pin 3 ≈ 5 V, <b>pin 4 ≈ 5 V</b> (the AVR holds the head's RX line idle-high). <b>10 V on pins 2–4: stop</b>, the cable is reversed.</td><td class="num"><a href="#" class="stepln" data-step="c-plug">48</a> · <a href="#" class="stepln" data-step="c-meas">49</a></td></tr>
+      <tr><td class="num">2</td><td>Truck</td><td>Radio off. Plug in the head. Radio on: the radio should work normally (display, keys, brightness), with every body→head byte passing through the AVR.</td><td class="num"><a href="#" class="stepln" data-step="f-fwd">62</a></td></tr>
+      <tr><td class="num">3</td><td>Truck</td><td>Same setup: logic analyzer on R6's and R7's right leads, as in step 51 (both feed AVR inputs, so they carry the radio's own traffic unchanged). Capture power-on, key presses, brightness steps through the menu, a minute of idle. Save the <code>.sr</code> and hand it to Claude. Optionally log with the FT232 at the same time (RX and GND only).</td><td class="num"><a href="#" class="stepln" data-step="e-wire">51</a>–<a href="#" class="stepln" data-step="e-save">54</a> · <a href="#" class="stepln" data-step="f-logwire">63</a></td></tr>
+      <tr><td class="num">⤷</td><td>Truck, only if row 2 fails</td><td>Display freezes or garbles: radio off, <b>pull the AVR</b>, <b>fit JP1</b>, radio on. If the radio then works (bypass), the board and cables are fine and the firmware is the problem; capture in bypass and tell Claude. If it still fails, check the cables and jacks.</td><td class="num"><a href="#" class="stepln" data-step="d-run">50</a></td></tr>
+      <tr><td class="num">4</td><td>Truck or bench</td><td>After Claude confirms the protocol constants from the capture: flash the full firmware (FT232 programmer; the radio powers the board), then check day and night brightness with the parking lights.</td><td class="num"><a href="#" class="stepln" data-step="f-full">64</a> · <a href="#" class="stepln" data-step="f-verify">65</a></td></tr>
+      <tr><td class="num">5</td><td>Bench</td><td>Glue Y1's can (Permatex Ultra Black, a grain-of-rice dab). 24 h cure before closing the case.</td><td class="num"><a href="#" class="stepln" data-step="c-glue">38</a></td></tr>
+      <tr><td class="num">6</td><td>Bench → truck</td><td>Close the case only after the full firmware is in and Y1's glue has cured (J4 and JP1 are sealed inside). Screw it shut, optional soak, then install with J3 tapped to TAIL and chassis ground.</td><td class="num"><a href="#" class="stepln" data-step="j-plan">43</a> · <a href="#" class="stepln" data-step="k-fit">67</a>–<a href="#" class="stepln" data-step="k-install">70</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Pack for the truck</h3>
+  <ul class="plain small">
+    <li>Board (AVR in), JP1 shunt and ESD wrist strap (only needed for the bypass fallback)</li>
+    <li>Meter, logic analyzer, laptop with PulseView, Dupont jumpers</li>
+    <li>FT232 adapter. For row 4 on site, also the breadboard programmer (2.2 kΩ + jumpers)</li>
+    <li>The J3 plug with its labelled ILL+ (orange) and GND (black) leads</li>
+  </ul>
+  <div class="warn"><b>⚠️ AVR in or out.</b><span>Everything runs with the AVR <b>in</b> and JP1 <b>parked</b>. Only the bypass fallback needs the AVR <b>out</b> and JP1 <b>fitted</b>. Never fit the JP1 shunt with the AVR in, and always swap the chip with the radio off.</span></div>
+</section>
+
+<!-- 1 TOOLS -->
+<section id="tools">
+  <div class="sec-head"><span class="sec-num">1</span><h2>What you need</h2><span class="sec-prog" data-sec="tools"></span></div>
+  <ul class="steps">
+    <li class="step" data-id="t-iron"><span class="t">YIHUA 926 III with a 1.6–2.4 mm chisel tip</span><span class="dim small">About 330 °C (625 °F) for 63/37. Go 20–30 °C (35–55 °F) hotter only on pins tied to the GND pour (they soak heat). This iron displays °F: if the setting goes past 480, it's in Fahrenheit.</span></li>
+    <li class="step" data-id="t-solder"><span class="t">MAIYUM 63/37 0.8 mm rosin-core solder and Chip Quik SMD4300TF10 tack flux</span></li>
+    <li class="step" data-id="t-hand"><span class="t">Flush cutters, needle-nose pliers, solder wick, PCB holder</span></li>
+    <li class="step" data-id="t-clean"><span class="t">IPA and a brush</span></li>
+    <li class="step" data-id="t-esd"><span class="t">ESD mat and wrist strap</span></li>
+    <li class="step" data-id="t-meter"><span class="t">Multimeter, bench supply, calipers</span></li>
+    <li class="step" data-id="t-la"><span class="t">HiLetgo 24 MHz 8-channel logic analyzer, PulseView (sigrok) installed</span></li>
+    <li class="step" data-id="t-ch340"><span class="t">FT232 USB-serial adapter (jumper on 5V), Dupont jumpers (M-F and F-F), breadboard, USB-C/A adapters</span><span class="dim small">The HiLetgo CH340 modules from this build couldn't receive (they fail a TXD↔RXD loopback), so they can't program. One FT232 does both jobs: programmer, then logger.</span></li>
+    <li class="step" data-id="t-mf"><span class="t">Micro-Fit 3.0 dual-row 2×1 pre-crimped kit (male and female housings)</span></li>
+    <li class="step" data-id="t-screws"><span class="t">4 × M3 × 16 screws for the case</span></li>
+    <li class="step" data-id="t-pdf"><span class="t"><code>checks/board_top_1to1.pdf</code> printed at 100 % (no "fit to page")</span><span class="dim small">Check a known dimension with calipers: the board outline is 54.0 × 52.0 mm.</span></li>
+  </ul>
+</section>
+
+<!-- 2 PARTS -->
+<section id="parts">
+  <div class="sec-head"><span class="sec-num">2</span><h2>Parts</h2></div>
+  <p>26 board references plus the DIP-28 socket. TP2 is a bare pad: nothing is fitted there.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Ref</th><th>Part</th><th>Bag MPN</th><th>Marking / check</th></tr></thead>
+    <tbody>
+      <tr><td class="num">U1</td><td>AVR128DB28, DIP-28, in a 0.3 in machined socket</td><td class="num small">AVR128DB28-I/SP<br>socket 110-43-328-41-001000</td><td>Leave out until programming</td></tr>
+      <tr><td class="num">U2</td><td>LM2936Z-5.0 or AP7381-50V-A, TO-92</td><td class="num small">LM2936Z-5.0/NOPB</td><td>Read the part number on the flat face</td></tr>
+      <tr><td class="num">U3</td><td>SFH617A-3 optocoupler, DIP-4</td><td class="num small">SFH617A-3</td><td>Pin-1 dot</td></tr>
+      <tr><td class="num">Y1</td><td>32.768 kHz cylinder crystal</td><td class="num small">AB26TRB-32.768KHZ-T</td><td>Fragile leads</td></tr>
+      <tr><td class="num">C1 C2 C3 C5</td><td>100 nF ceramic</td><td class="num small">C320C104K5R5TA</td><td><span class="mono">104</span></td></tr>
+      <tr><td class="num">C7 C8</td><td>15 pF C0G</td><td class="num small">C315C150J1G5TA</td><td><span class="mono">150</span></td></tr>
+      <tr><td class="num">C4</td><td>22 µF 16 V tantalum</td><td class="num small">T350F226K016AT</td><td>Polarized, + marked</td></tr>
+      <tr><td class="num">C6</td><td>10 µF 25 V electrolytic, Panasonic EEA-FC1E100</td><td class="num small">EEA-FC1E100</td><td>Polarized, stripe = −</td></tr>
+      <tr><td class="num">D1</td><td>1N4148</td><td class="num small">1N4148</td><td>Black band = cathode</td></tr>
+      <tr><td class="num">J1 J2</td><td>Würth 615004143821 4P4C jacks (J1 BODY, J2 HEAD)</td><td class="num small">615004143821</td><td></td></tr>
+      <tr><td class="num">J3</td><td>Molex Micro-Fit 3.0 43045-0200, right-angle dual-row, 2 pins</td><td class="num small">43045-0200</td><td></td></tr>
+      <tr><td class="num">J4</td><td>1×3 header from the 40-pin strip</td><td class="num small">PRPC040SAAN-RC</td><td>1 GND · 2 UPDI · 3 TX</td></tr>
+      <tr><td class="num">JP1</td><td>1×2 header from the same strip</td><td class="num small">PRPC040SAAN-RC<br>shunt SNT-100-BK-G</td><td>Shunt kept loose</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Resistors: meter each one as it comes out of its bag</h3>
+  <p class="small dim">Don't trust the colour bands. Take one out, meter it, and put it straight into its holes.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Ref</th><th>Value</th><th>Bag MPN</th><th>Meter reads</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td class="num">R6 R7 R11</td><td class="num">10 kΩ ¼ W</td><td class="num small">MFR-25FBF52-10K</td><td class="num">9.9–10.1 k</td><td>All three lie flat; R11 runs up-down</td></tr>
+      <tr><td class="num">R2 R13</td><td class="num">470 Ω ¼ W</td><td class="num small">MFR-25FBF52-470R</td><td class="num">465–475</td><td></td></tr>
+      <tr><td class="num">R10</td><td class="num">680 Ω ¼ W</td><td class="num small">MFR-25FBF52-680R</td><td class="num">673–687</td><td>7.62 mm pitch: tight bend at the body</td></tr>
+      <tr><td class="num">R9</td><td class="num">2.2 kΩ ½ W</td><td class="num small">MFR50SFTE52-2K2</td><td class="num">2.18–2.22 k</td><td>Larger body; spares feed the programmer</td></tr>
+      <tr><td class="num">R1</td><td class="num">150 Ω 1 W</td><td class="num small">FMP100JR-52-150R</td><td class="num">143–158</td><td>Largest body, 5 % part</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 3 MAP -->
+<section id="map">
+  <div class="sec-head"><span class="sec-num">3</span><h2>Board placement map</h2></div>
+  <figure>
+    <div class="map">
+<svg viewBox="-3 -6 60 62" role="img" aria-labelledby="map-title">
+  <title id="map-title">Top view of the Rev A board with part outlines, pin 1 and polarity marks</title>
+  <defs>
+    <pattern id="hatch" width=".7" height=".7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width=".7" height=".7" fill="none"/>
+      <line x1="0" y1="0" x2="0" y2=".7" style="stroke: var(--warn); stroke-width: .3"/>
+    </pattern>
+  </defs>
+  <text class="edge" x="27" y="-2.6" text-anchor="middle">TOP EDGE · connector faces flush · ▲ cables plug in here</text>
+  <rect class="pcb" x="0" y="0" width="54" height="52" rx="1"/>
+  <!-- mounting holes -->
+  <circle class="hole" cx="3.5" cy="3.5" r="1.6"/><circle class="hole" cx="50.5" cy="3.5" r="1.6"/>
+  <circle class="hole" cx="50.5" cy="48.5" r="1.6"/><circle class="hole" cx="3.5" cy="48.5" r="1.6"/>
+
+  <!-- ILL isolated zone -->
+  <g class="part" data-part="ILL">
+  <rect class="zone" x="34.6" y="0.6" width="19" height="23.9" rx=".6"/>
+  <text class="s" x="48.6" y="9" text-anchor="middle">ILL ZONE</text>
+  <text class="s" x="48.6" y="10.4" text-anchor="middle">no pour</text>
+  </g>
+
+  <!-- J1 BODY -->
+  <g class="part" data-part="J1">
+  <rect class="bodyf" x="8.33" y="0" width="10" height="13"/>
+  <circle class="peg" cx="8.33" cy="6" r="1.18"/><circle class="peg" cx="18.33" cy="6" r="1.18"/>
+  <rect class="p1" data-pin="1" x="11.05" y="7.55" width="1.5" height="1.5"/>
+  <circle class="pad" data-pin="2" cx="12.82" cy="10.84" r=".75"/><circle class="pad" data-pin="3" cx="13.84" cy="8.3" r=".75"/><circle class="pad" data-pin="4" cx="14.86" cy="10.84" r=".75"/>
+  <text class="ref" x="13.33" y="3.3" text-anchor="middle">J1 BODY</text>
+  <text class="s" x="11.8" y="6.6" text-anchor="middle">1</text>
+  </g>
+  <!-- J2 HEAD -->
+  <g class="part" data-part="J2">
+  <rect class="bodyf" x="21.33" y="0" width="10" height="13"/>
+  <circle class="peg" cx="21.33" cy="6" r="1.18"/><circle class="peg" cx="31.33" cy="6" r="1.18"/>
+  <rect class="p1" data-pin="1" x="24.05" y="7.55" width="1.5" height="1.5"/>
+  <circle class="pad" data-pin="2" cx="25.82" cy="10.84" r=".75"/><circle class="pad" data-pin="3" cx="26.84" cy="8.3" r=".75"/><circle class="pad" data-pin="4" cx="27.86" cy="10.84" r=".75"/>
+  <text class="ref" x="26.33" y="3.3" text-anchor="middle">J2 HEAD</text>
+  <text class="s" x="24.8" y="6.6" text-anchor="middle">1</text>
+  </g>
+  <!-- J3 -->
+  <g class="part" data-part="J3">
+  <rect class="bodyf" x="35.8" y="0.4" width="7.4" height="10.1"/>
+  <circle class="peg" cx="39.5" cy="5.1" r="1"/>
+  <rect class="p1" data-pin="1" x="38.7" y="8.62" width="1.6" height="1.6" rx=".3"/>
+  <circle class="pad" data-pin="2" cx="39.5" cy="12.42" r=".8"/>
+  <text class="ref" x="39.5" y="2.6" text-anchor="middle">J3 ILL</text>
+  <text class="s" x="44" y="9.8">1 ILL+</text>
+  <text class="s" x="41" y="13">2 GND</text>
+  </g>
+
+  <!-- R9 R10 D1 -->
+  <g class="part" data-part="R9">
+  <line class="lead" x1="39.4" y1="15.8" x2="52.1" y2="15.8"/>
+  <rect class="bodyf" x="42.6" y="14.6" width="6.4" height="2.4" rx=".6"/>
+  <circle class="pad" cx="39.4" cy="15.8" r=".75"/><circle class="pad" cx="52.1" cy="15.8" r=".75"/>
+  <text class="ref" x="45.8" y="16.3" text-anchor="middle">R9</text>
+  </g>
+  <g class="part" data-part="R10">
+  <line class="lead" x1="39.4" y1="19.3" x2="47.02" y2="19.3"/>
+  <rect class="bodyf" x="41.2" y="18.3" width="4" height="2" rx=".5"/>
+  <circle class="pad" cx="39.4" cy="19.3" r=".75"/><circle class="pad" cx="47.02" cy="19.3" r=".75"/>
+  <text class="ref" x="43.2" y="19.75" text-anchor="middle">R10</text>
+  </g>
+  <g class="part" data-part="D1">
+  <line class="lead" x1="39.4" y1="22.3" x2="47.02" y2="22.3"/>
+  <rect class="bodyf" x="41.09" y="21.2" width="4.24" height="2.2" rx=".4"/>
+  <rect class="pol" x="41.6" y="21.2" width=".6" height="2.2"/>
+  <rect class="p1" x="38.65" y="21.55" width="1.5" height="1.5" rx=".3"/>
+  <circle class="pad" cx="47.02" cy="22.3" r=".75"/>
+  <text class="ref" x="43.8" y="22.75" text-anchor="middle">D1</text>
+  <text class="s" x="36.2" y="22.7" text-anchor="middle">K</text>
+  </g>
+  <!-- U3 -->
+  <g class="part" data-part="U3">
+  <rect class="bodyf" x="48.3" y="20.4" width="5.4" height="5.8" rx=".3"/>
+  <circle class="pol" cx="52.4" cy="21.5" r=".45"/>
+  <rect class="p1" x="51.55" y="18.75" width="1.5" height="1.5" rx=".3"/>
+  <circle class="pad" cx="49.76" cy="19.5" r=".75"/><circle class="pad" cx="49.76" cy="27.12" r=".75"/><circle class="pad" cx="52.3" cy="27.12" r=".75"/>
+  <text class="ref" x="50.6" y="24" text-anchor="middle">U3</text>
+  </g>
+
+  <!-- R6 R7 R2 -->
+  <g class="part" data-part="R6">
+  <line class="lead" x1="3" y1="20.6" x2="13.16" y2="20.6"/>
+  <rect class="bodyf" x="5.1" y="19.5" width="6" height="2.2" rx=".5"/>
+  <circle class="pad" data-pin="1" cx="3" cy="20.6" r=".75"/><circle class="pad" data-pin="2" cx="13.16" cy="20.6" r=".75"/>
+  <text class="ref" x="8.1" y="21.05" text-anchor="middle">R6</text>
+  <circle class="probe-dot" cx="13.16" cy="20.6" r="1.25"/>
+  <text class="probe" x="13.16" y="18.7" text-anchor="middle">CH0</text>
+  </g>
+  <g class="part" data-part="R7">
+  <line class="lead" x1="16" y1="20.6" x2="26.16" y2="20.6"/>
+  <rect class="bodyf" x="18.1" y="19.5" width="6" height="2.2" rx=".5"/>
+  <circle class="pad" data-pin="1" cx="16" cy="20.6" r=".75"/><circle class="pad" data-pin="2" cx="26.16" cy="20.6" r=".75"/>
+  <text class="ref" x="21.1" y="21.05" text-anchor="middle">R7</text>
+  <circle class="probe-dot" cx="26.16" cy="20.6" r="1.25"/>
+  <text class="probe" x="26.16" y="18.7" text-anchor="middle">CH1</text>
+  </g>
+  <g class="part" data-part="R2">
+  <line class="lead" x1="3" y1="25" x2="13.16" y2="25"/>
+  <rect class="bodyf" x="5.1" y="23.9" width="6" height="2.2" rx=".5"/>
+  <circle class="pad" cx="3" cy="25" r=".75"/><circle class="pad" cx="13.16" cy="25" r=".75"/>
+  <text class="ref" x="8.1" y="25.45" text-anchor="middle">R2</text>
+  </g>
+  <!-- JP1 -->
+  <g class="part" data-part="JP1">
+  <rect class="body" x="15.25" y="23.75" width="5.04" height="2.5" rx=".3"/>
+  <rect class="p1" x="15.75" y="24.25" width="1.5" height="1.5"/>
+  <circle class="pad" cx="19.04" cy="25" r=".75"/>
+  <text class="ref" x="17.8" y="23.2" text-anchor="middle">JP1</text>
+  </g>
+  <!-- C1 -->
+  <g class="part" data-part="C1">
+  <rect class="body" x="22.9" y="24.1" width="4.3" height="1.8" rx=".8"/>
+  <circle class="pad" cx="23.82" cy="25" r=".7"/><circle class="pad" cx="26.32" cy="25" r=".7"/>
+  <text class="ref" x="25.07" y="23.5" text-anchor="middle">C1</text>
+  </g>
+  <!-- Y1 -->
+  <g class="part" data-part="Y1">
+  <rect class="bodyf" x="34.05" y="17" width="2" height="6" rx=".9"/>
+  <line class="lead" x1="34.6" y1="23" x2="34.1" y2="25"/><line class="lead" x1="35.5" y1="23" x2="36" y2="25"/>
+  <circle class="pad" cx="34.1" cy="25" r=".6"/><circle class="pad" cx="36" cy="25" r=".6"/>
+  <text class="ref" x="32.4" y="20.4" text-anchor="middle">Y1</text>
+  </g>
+
+  <!-- U1 socket (pads 2-28 are added by the script) -->
+  <g class="part" data-part="U1">
+  <path class="bodyf" d="M4.6 27 H40.4 V37.4 H4.6 V33.4 A1.2 1.2 0 0 0 4.6 31 Z"/>
+  <g id="u1pins">
+    <rect class="p1" data-pin="1" x="5.25" y="35.25" width="1.5" height="1.5" rx=".3"/>
+  </g>
+  <text class="ref" x="22.5" y="32.2" text-anchor="middle">U1 socket · AVR128DB28</text>
+  <text class="s" x="22.5" y="33.8" text-anchor="middle">◀ notch / pin 1 at the left</text>
+  <text class="s" x="6" y="38.9" text-anchor="middle">1</text>
+  <text class="s" x="21.24" y="38.9" text-anchor="middle">7</text>
+  <text class="s" x="39.02" y="38.9" text-anchor="middle">14</text>
+  <text class="s" x="41.3" y="28.75">15</text>
+  </g>
+  <!-- C7 C8 C2 -->
+  <g class="part" data-part="C7">
+  <circle class="pad" cx="42.4" cy="30" r=".7"/><circle class="pad" cx="42.4" cy="27.5" r=".7"/>
+  <rect class="body" x="41.5" y="26.6" width="1.8" height="4.3" rx=".8"/>
+  <text class="ref" x="42.4" y="32.4" text-anchor="middle">C7</text>
+  </g>
+  <g class="part" data-part="C8">
+  <circle class="pad" cx="45.8" cy="30" r=".7"/><circle class="pad" cx="45.8" cy="27.5" r=".7"/>
+  <rect class="body" x="44.9" y="26.6" width="1.8" height="4.3" rx=".8"/>
+  <text class="ref" x="45.8" y="32.4" text-anchor="middle">C8</text>
+  </g>
+  <g class="part" data-part="C2">
+  <circle class="pad" cx="42.5" cy="35.5" r=".7"/><circle class="pad" cx="42.5" cy="33" r=".7"/>
+  <rect class="body" x="41.6" y="32.1" width="1.8" height="4.3" rx=".8"/>
+  <text class="ref" x="44" y="35.9">C2</text>
+  </g>
+  <!-- R11, lies flat, rotated 90 degrees -->
+  <g class="part" data-part="R11">
+  <line class="lead" x1="51.5" y1="29.84" x2="51.5" y2="40"/>
+  <rect class="bodyf" x="50.4" y="32" width="2.2" height="5.8" rx=".5"/>
+  <circle class="pad" cx="51.5" cy="29.84" r=".75"/><circle class="pad" cx="51.5" cy="40" r=".75"/>
+  <text class="ref" x="51.5" y="35.3" text-anchor="middle" transform="rotate(-90 51.5 34.9)">R11</text>
+  </g>
+  <!-- TP2 -->
+  <g class="part" data-part="TP2">
+  <circle class="pad" cx="46.5" cy="37.4" r="1"/>
+  <circle class="probe-dot" cx="46.5" cy="37.4" r="1.6"/>
+  <text class="probe" x="46.5" y="40.3" text-anchor="middle">TP2 GND</text>
+  </g>
+
+  <!-- C3 R13 R1 -->
+  <g class="part" data-part="C3">
+  <rect class="body" x="12.6" y="38.9" width="4.3" height="1.8" rx=".8"/>
+  <circle class="pad" cx="13.5" cy="39.8" r=".7"/><circle class="pad" cx="16" cy="39.8" r=".7"/>
+  <text class="ref" x="14.75" y="42.4" text-anchor="middle">C3</text>
+  </g>
+  <g class="part" data-part="R13">
+  <line class="lead" x1="19" y1="39.8" x2="29.16" y2="39.8"/>
+  <rect class="bodyf" x="21.1" y="38.7" width="6" height="2.2" rx=".5"/>
+  <circle class="pad" cx="19" cy="39.8" r=".75"/><circle class="pad" cx="29.16" cy="39.8" r=".75"/>
+  <text class="ref" x="24.1" y="40.25" text-anchor="middle">R13</text>
+  </g>
+  <g class="part" data-part="R1">
+  <line class="lead" x1="32.2" y1="42.5" x2="47.44" y2="42.5"/>
+  <rect class="bodyf" x="35.6" y="41.1" width="8.4" height="2.8" rx=".8"/>
+  <circle class="pad" data-pin="1" cx="32.2" cy="42.5" r=".8"/><circle class="pad" data-pin="2" cx="47.44" cy="42.5" r=".8"/>
+  <text class="ref" x="39.8" y="43" text-anchor="middle">R1 1 W</text>
+  <text class="probe" x="31.2" y="42.9" text-anchor="end">PB</text>
+  </g>
+  <!-- J4 -->
+  <g class="part" data-part="J4">
+  <rect class="body" x="8.7" y="44.7" width="7.7" height="2.6" rx=".3"/>
+  <rect class="p1" data-pin="1" x="9.25" y="45.25" width="1.5" height="1.5"/>
+  <circle class="pad" data-pin="2" cx="12.54" cy="46" r=".75"/><circle class="pad" data-pin="3" cx="15.08" cy="46" r=".75"/>
+  <text class="ref" x="7.9" y="46.45" text-anchor="end">J4</text>
+  <text class="s" x="10" y="48.9" text-anchor="middle">GND</text>
+  <text class="s" x="12.54" y="48.9" text-anchor="middle">UPDI</text>
+  <text class="s" x="15.08" y="48.9" text-anchor="middle">TX</text>
+  </g>
+  <!-- C6 -->
+  <g class="part" data-part="C6">
+  <circle class="body" cx="20" cy="48.5" r="2.6"/>
+  <path class="hatch" d="M21 46.1 A2.6 2.6 0 0 1 21 50.9 Z"/>
+  <rect class="p1" x="18.3" y="47.8" width="1.4" height="1.4" rx=".3"/>
+  <circle class="pad" cx="21" cy="48.5" r=".7"/>
+  <text class="ref" x="17.0" y="46.8" text-anchor="middle" style="fill: var(--warn)">+</text>
+  <text class="ref" x="20" y="45.3" text-anchor="middle">C6</text>
+  </g>
+  <!-- C5 -->
+  <g class="part" data-part="C5">
+  <rect class="body" x="23.6" y="47.6" width="4.3" height="1.8" rx=".8"/>
+  <circle class="pad" cx="24.5" cy="48.5" r=".7"/><circle class="pad" cx="27" cy="48.5" r=".7"/>
+  <text class="ref" x="25.75" y="46.6" text-anchor="middle">C5</text>
+  </g>
+  <!-- U2 -->
+  <g class="part" data-part="U2">
+  <path class="body" d="M31.3 46.65 H36.6 A2.65 2.65 0 0 1 31.3 46.65 Z"/>
+  <line class="polline" x1="31.3" y1="46.65" x2="36.6" y2="46.65"/>
+  <circle class="pad" cx="31.42" cy="48.5" r=".7"/><circle class="pad" cx="33.96" cy="48.5" r=".7"/>
+  <rect class="p1" x="35.8" y="47.8" width="1.4" height="1.4"/>
+  <text class="ref" x="33.96" y="45.6" text-anchor="middle">U2 flat ▲</text>
+  <text class="s" x="31.42" y="51.4" text-anchor="middle">IN</text>
+  <text class="s" x="33.96" y="51.4" text-anchor="middle">GND</text>
+  <text class="s" x="36.5" y="51.4" text-anchor="middle">OUT</text>
+  </g>
+  <!-- C4 -->
+  <g class="part" data-part="C4">
+  <circle class="body" cx="41.75" cy="48.5" r="2.9"/>
+  <rect class="p1" x="39.8" y="47.8" width="1.4" height="1.4" rx=".3"/>
+  <circle class="pad" cx="43" cy="48.5" r=".7"/>
+  <text class="ref" x="38.4" y="46.4" text-anchor="middle" style="fill: var(--warn)">+</text>
+  <text class="ref" x="45.2" y="49" >C4</text>
+  </g>
+</svg>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background: var(--stop)"></i>Square pad: pin 1, + or cathode</span>
+      <span><i class="sw" style="background: var(--warn)"></i>Polarity mark (band, dot, flat, −)</span>
+      <span><i class="sw" style="border: 1.5px solid var(--purple)"></i>Probe point</span>
+      <span><i class="sw" style="border: 1.5px dashed var(--purple)"></i>ILL zone</span>
+    </div>
+    <figcaption>Top view, drawn from pad coordinates in the PCB file. Bodies are approximate. The board silkscreen and the printed <code>checks/board_top_1to1.pdf</code> are authoritative. Seen from the solder side, everything is mirrored left to right.</figcaption>
+  </figure>
+</section>
+
+<!-- 4 PRE -->
+<section id="pre">
+  <div class="sec-head"><span class="sec-num">4</span><h2>Before soldering</h2><span class="sec-prog" data-sec="pre"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="p-esd"><span class="t">Set up ESD: mat grounded, wrist strap on.</span><span class="dim small">Matters most for U1 and U3; habit for everything.</span></li>
+    <li class="step" data-id="p-pdf"><span class="t">Lay the bare board on the 1:1 print and confirm it matches.</span></li>
+    <li class="step" data-id="p-jacks" data-parts="J1 J2 R1.1 TP2"><span class="t">Bare-board continuity: J1 to J2, pin for pin.</span>
+      <div class="expect"><b>Expected</b>
+        <table><tr><td>Pins 1, 2, 3 (J1 ↔ J2)</td><td class="num">≈ 0 Ω each</td></tr>
+        <tr><td>Pin 4 (J1 ↔ J2)</td><td class="num">open</td></tr>
+        <tr><td>PB (R1 left pad) ↔ TP2</td><td class="num">open, no short</td></tr></table>
+      </div>
+      <span class="dim small">Pin 1 is the square pad on each jack footprint (see map).</span>
+    </li>
+    <li class="step" data-id="p-dry" data-parts="J1 J2 J3 U1 C6"><span class="t">Dry-fit J1, J2, J3, the DIP socket and C6.</span><span class="dim small">Jacks and J3 should drop in with pegs seated. C6's 1.5 mm leads need a slight spread to match the 2.0 mm holes; spread them now.</span></li>
+    <li class="step" data-id="p-sort" data-parts="C1 C2 C3 C5 C7 C8"><span class="t">Sort ceramics: 104 (C1, C2, C3, C5) apart from 150 (C7, C8).</span></li>
+    <li class="step" data-id="p-res" data-parts="R1 R2 R6 R7 R9 R10 R11 R13"><span class="t">Keep each resistor value in its own DigiKey bag until its soldering step.</span><span class="dim small">Each step in section 5 names its bag. Meter every resistor as it comes out.</span></li>
+  </ol>
+</section>
+
+<!-- 5 SOLDER -->
+<section id="solder">
+  <div class="sec-head"><span class="sec-num">5</span><h2>Soldering, lowest parts first</h2><span class="sec-prog" data-sec="solder"></span></div>
+  <div class="note small"><span><b>Every joint:</b> tin the tip, heat pad and lead together for 1–2 s, feed solder into the joint (not onto the tip), remove solder, then iron. Aim for a shiny concave cone. Bend leads out 30° on the underside to hold parts while you solder; trim later. Ground-pour pins (jack pin 2, socket 15 and 21, U2 GND, C4/C6 −, J4 pin 1, capacitor GND pads) take longer: raise to about 350–360 °C (660–680 °F) if solder balls instead of wetting.</span></div>
+  <div class="note small"><span><b>One bag per step.</b> Each step uses one DigiKey bag (MPN shown). Open only that bag, meter each resistor as it comes out, and close the bag before the next step.</span></div>
+  <ol class="steps">
+    <li class="step" data-id="s-r-10k" data-parts="R6 R7 R11"><span class="t">10 kΩ ¼ W: R6, R7, R11.</span>
+      <span class="bag">MFR-25FBF52-10K · meter 9.9–10.1 k</span>
+      <span class="dim small">All three lie flat on the board, like any resistor: bend both leads down 90° so they're 10.16 mm apart, and press the body against the board. R6 and R7 run left to right. R11 is the same but turned to run up and down, along the right edge, just right of C8 and TP2.</span>
+    </li>
+    <li class="step" data-id="s-r-470" data-parts="R2 R13"><span class="t">470 Ω ¼ W: R2, R13.</span>
+      <span class="bag">MFR-25FBF52-470R · meter 465–475</span>
+      <span class="dim small">Both lie flat (10.16 mm pitch). Its bands look like the 680 Ω's; trust the meter.</span>
+    </li>
+    <li class="step" data-id="s-r-680" data-parts="R10"><span class="t">680 Ω ¼ W: R10.</span>
+      <span class="bag">MFR-25FBF52-680R · meter 673–687</span>
+      <span class="dim small">7.62 mm pitch: bend its leads tight against the body ends. Inside the ILL zone.</span>
+    </li>
+    <li class="step" data-id="s-r9" data-parts="R9"><span class="t">2.2 kΩ ½ W: R9.</span>
+      <span class="bag">MFR50SFTE52-2K2 · meter 2.18–2.22 k</span>
+      <span class="dim small">Larger body. Inside the ILL zone. Keep the bag: a spare goes into the programmer in section 9.</span>
+    </li>
+    <li class="step" data-id="s-r1" data-parts="R1"><span class="t">150 Ω 1 W: R1.</span>
+      <span class="bag">FMP100JR-52-150R · meter 143–158</span>
+      <span class="dim small">Largest body. Lift it about 1 mm off the board so it can shed heat.</span>
+    </li>
+    <li class="step" data-id="s-d1" data-parts="D1"><span class="t">D1 1N4148.</span>
+      <span class="bag">1N4148 (onsemi)</span>
+      <div class="warn"><b>⚠️ Polarity.</b> Cathode band to the LEFT, on the square pad at x 39.4, matching the band on the silk.</div>
+    </li>
+    <li class="step" data-id="s-y1" data-parts="Y1"><span class="t">Y1 crystal, lying flat with the can toward the top edge.</span>
+      <span class="bag">AB26TRB-32.768KHZ-T</span>
+      <div class="warn"><b>⚠️ Fragile.</b> Bend each lead gently about 1 mm from the can, never at the glass seal. Quick joints: flux, tinned tip, 1–2 s per lead, 10 s between leads. Keep the iron at the normal setting; a cooler tip means longer heat.</div>
+      <span class="dim small">The leads are very short and may not come through the board. Tape the can down to hold it and solder on the top side, where the leads enter the pads (the holes are plated, so a top joint is fine). Keep the tip off the can, and don't trim the leads. Don't pre-tin these pads: solder fills the 0.5 mm holes and is hard to remove.</span>
+    </li>
+    <li class="step" data-id="s-y1-check" data-parts="Y1 U1.16 U1.17"><span class="t">Check Y1's joints with the meter (continuity).</span>
+      <span class="dim small">Probe the lead wire itself, between the can and the pad, so the reading goes through the joint. The socket isn't fitted yet, so its holes are bare pads.</span>
+      <div class="expect"><b>Expected</b>
+        <table><tr><td>Right lead (nearer J3) ↔ socket pin 16 (top row, 2nd from right)</td><td class="num">≈ 0 Ω</td></tr>
+        <tr><td>Left lead ↔ socket pin 17 (top row, 3rd from right)</td><td class="num">≈ 0 Ω</td></tr>
+        <tr><td>Y1 pad ↔ Y1 pad</td><td class="num">open</td></tr></table>
+      </div>
+    </li>
+    <li class="step" data-id="s-socket" data-parts="U1"><span class="t">DIP-28 socket. AVR stays out.</span>
+      <span class="bag">110-43-328-41-001000</span>
+      <div class="warn"><b>⚠️ Orientation.</b> Notch to the LEFT (pin 1 at bottom-left, square pad).</div>
+      <span class="dim small">The socket falls out when the board is flipped: put a book or cardboard over it, flip both together, and let the board rest on the socket (or tape it). Tack two opposite corners, pin 28 (top-left) and pin 14 (bottom-right); neither is on the ground pour, so they're quick. Check it sits flat; reheat a tack and press if not. Then solder the remaining 26. Pins 15 and 21 are on the ground pour and may need 660–680 °F.</span>
+    </li>
+    <li class="step" data-id="s-u3" data-parts="U3"><span class="t">U3 SFH617A-3, soldered directly (no socket).</span>
+      <span class="bag">SFH617A-3</span>
+      <div class="warn"><b>⚠️ Orientation.</b> Pin-1 dot at TOP-RIGHT, on the square pad nearest the board's right edge. The chip's two rows of legs run left to right (pins 2 and 1 on top, 3 and 4 below).</div>
+    </li>
+    <li class="step" data-id="s-c104" data-parts="C1 C2 C3 C5"><span class="t">100 nF ceramics (104): C1, C2, C3, C5.</span>
+      <span class="bag">C320C104K5R5TA</span>
+      <span class="dim small">Not polarized. C1 is beside JP1, C2 beside the socket's right end, C3 below the socket's left half, C5 next to C6.</span>
+    </li>
+    <li class="step" data-id="s-c150" data-parts="C7 C8"><span class="t">15 pF ceramics (150): C7, C8.</span>
+      <span class="bag">C315C150J1G5TA</span>
+      <span class="dim small">Not polarized. They're the pair just right of the socket's top-right corner, not right next to the crystal. Check the 150 marking before each one.</span>
+    </li>
+    <li class="step" data-id="s-headers" data-parts="JP1 J4"><span class="t">JP1 (1×2) and J4 (1×3), snapped from the 40-pin strip.</span>
+      <span class="bag">PRPC040SAAN-RC</span>
+      <span class="dim small">Solder one pin, check the header is square to the board, then the rest. Park the JP1 shunt on one pin only.</span>
+    </li>
+    <li class="step" data-id="s-u2" data-parts="U2"><span class="t">U2 regulator (TO-92).</span>
+      <span class="bag">LM2936Z-5.0/NOPB</span>
+      <div class="warn"><b>⚠️ Orientation.</b> Flat face toward the board centre (away from the bottom edge), matching the flat line on the silk. OUT is the square pad on the right, IN on the left.</div>
+      <div class="note small"><span>If you're fitting the <b>AP7381-50V-A</b>, check its datasheet pinout first. The BOM claims 1 = OUT, 2 = GND, 3 = IN, the same as the LM2936. If it differs, stop and ask Claude.</span></div>
+    </li>
+    <li class="step" data-id="s-c4" data-parts="C4"><span class="t">C4 22 µF tantalum.</span>
+      <span class="bag">T350F226K016AT</span>
+      <div class="warn"><b>⚠️ Polarity.</b> + lead in the square pad (left, + on silk). A reversed tantalum fails hard, sometimes with smoke.</div>
+    </li>
+    <li class="step" data-id="s-c6" data-parts="C6"><span class="t">C6 10 µF electrolytic.</span>
+      <span class="bag">EEA-FC1E100</span>
+      <div class="warn"><b>⚠️ Polarity.</b> Short lead and stripe (−) go in the right pad, over the hatched half of the silk. Long lead (+) goes in the square pad on the left.</div>
+    </li>
+    <li class="step" data-id="s-j3" data-parts="J3"><span class="t">J3 Micro-Fit header.</span>
+      <span class="bag">43045-0200</span>
+      <span class="dim small">Seat the peg fully and solder both pins. Then measure the height from the board top to the top of the housing with calipers.</span>
+      <div class="note small"><span>The case assumes <code>MICROFIT_H = 10.3 mm</code>. Write down your reading: <b>______ mm</b>. If it differs, tell Claude to regenerate the case before you print.</span></div>
+    </li>
+    <li class="step" data-id="s-jacks" data-parts="J1 J2"><span class="t">J1 BODY and J2 HEAD, last.</span>
+      <span class="bag">615004143821</span>
+      <span class="dim small">Pegs in, press the faces flush with the board edge, solder one pin each and re-check flush before the rest.</span>
+      <div class="warn"><b>⚠️ Bridges.</b> The four pins are staggered and close. Inspect every gap with a loupe; wick any bridge.</div>
+    </li>
+  </ol>
+</section>
+
+<!-- 6 POST -->
+<section id="post">
+  <div class="sec-head"><span class="sec-num">6</span><h2>Trim, clean, inspect</h2><span class="sec-prog" data-sec="post"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="c-trim"><span class="t">Trim all leads to about 1 mm.</span><span class="dim small">The case allows 4 mm under the board. Set aside a spare 2.2 kΩ (R9 value) for the programmer in section 9.</span></li>
+    <li class="step" data-id="c-clean" data-parts="ILL"><span class="t">Clean flux with 90%+ IPA (99% preferred) and the brush, then dry fully. Not water: rosin and tack-flux residue won't wash off with it.</span><span class="dim small">Pay most attention to the ILL zone at the top right: residue there undermines the isolation.</span></li>
+    <li class="step" data-id="c-glue" data-parts="Y1"><span class="t">Glue Y1's can to the board once the board is clean and dry.</span><span class="dim small">A small dab of neutral-cure RTV silicone or hot glue between the can and the board, so vibration doesn't work the short leads. Avoid acid-cure (vinegar-smelling) silicone. The datasheet asks for this.</span></li>
+    <li class="step" data-id="c-inspect"><span class="t">Inspect every joint for bridges, cold joints and missing solder.</span></li>
+    <li class="step" data-id="c-short" data-parts="R1.1 TP2 U1.20 U1.21"><span class="t">Meter PB (R1 left lead) to TP2 again, and the socket's pin 20 to pin 21 (5 V to GND).</span>
+      <div class="expect"><b>Expected</b><span>Neither reads near 0 Ω. Capacitors charging from the meter will make the reading climb; that's fine.</span></div>
+    </li>
+  </ol>
+</section>
+
+<!-- 7 J3 PLUG -->
+<section id="j3plug">
+  <div class="sec-head"><span class="sec-num">7</span><h2>J3 plug</h2><span class="sec-prog" data-sec="j3plug"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="j-fit" data-parts="J3"><span class="t">Take a FEMALE 2×1 housing from the kit and test-fit it on J3.</span><span class="dim small">It should click and come off only when you press the latch.</span></li>
+    <li class="step" data-id="j-id" data-parts="J3.1"><span class="t">With it plugged in, meter which wire reaches J3 pin 1 (ILL+: the square pad, the upper of the two, nearer the top edge). Label that wire ILL+.</span></li>
+    <li class="step" data-id="j-plan" data-parts="J3"><span class="t">Plan the truck side: ILL+ to TAIL, the other wire to chassis ground.</span><span class="dim small">A male housing makes a handy inline disconnect behind the dash. Reversed wiring is harmless (D1 protects the opto) but the lights input won't work.</span></li>
+  </ol>
+</section>
+
+<!-- 8 TESTS -->
+<section id="tests">
+  <div class="sec-head"><span class="sec-num">8</span><h2>Tests with the AVR out</h2><span class="sec-prog" data-sec="tests"></span></div>
+  <div class="note small"><span><b>AVR already programmed?</b> Tests C and E also work with U1 in and the forward-only firmware running (JP1 parked); only J2 pin 4 reads differently (≈ 5 V). Test D, the bypass, always needs U1 out. See section 0 for the order.</span></div>
+  <p>U1 stays out of its socket for every test in this section (unless the note above applies). Socket pin numbers below are counted on the socket: pin 1 bottom-left, 1–14 along the bottom row left to right, 15–28 along the top row right to left.</p>
+
+  <h3>A · Power from the bench supply</h3>
+  <ol class="steps">
+    <li class="step" data-id="a-set"><span class="t">Set the bench supply to 10 V, current limit about 30 mA, output off.</span><span class="dim small">10 V stands in for the radio's PB. Don't use 12–14 V to mimic the truck.</span></li>
+    <li class="step" data-id="a-wire" data-parts="R1.1 TP2 U1.20 U1.21 U1.6 U1.14"><span class="t">+ to R1's left lead (PB end), − to TP2. Output on.</span>
+      <div class="expect"><b>Expected</b>
+        <table><tr><td>Supply current</td><td class="num">&lt; 1 mA</td></tr>
+        <tr><td>Socket pin 20 to pin 21</td><td class="num">5.0 V</td></tr>
+        <tr><td>Socket pins 6 and 14 to GND</td><td class="num">5.0 V</td></tr></table>
+      </div>
+      <div class="stop"><b>STOP</b><span>If the supply hits its current limit, or 5 V is missing or wrong: output off. Check U2 orientation, C4 and C6 polarity, and bridges near the power section.</span></div>
+    </li>
+  </ol>
+
+  <h3>B · Lights input</h3>
+  <ol class="steps">
+    <li class="step" data-id="b-on" data-parts="J3.1 J3.2 U1.7 TP2"><span class="t">Keep A connected. Connect J3 pin 1 (ILL+ wire) to the supply +, J3 pin 2 to −. Measure socket pin 7 to GND.</span>
+      <div class="expect"><b>Expected</b>
+        <table><tr><td>ILL powered</td><td class="num">&lt; 0.4 V</td></tr>
+        <tr><td>ILL disconnected</td><td class="num">≈ 5 V</td></tr></table>
+        <span class="small">Supply current rises by about 3 mA while ILL is powered.</span>
+      </div>
+    </li>
+    <li class="step" data-id="b-off"><span class="t">Disconnect the bench supply completely.</span></li>
+  </ol>
+
+  <h3>C · Radio, body cable only</h3>
+  <ol class="steps">
+    <li class="step" data-id="c-plug" data-parts="J1"><span class="t">Plug only the body cable into J1. Head cable stays out. Radio on.</span></li>
+    <li class="step" data-id="c-meas" data-fig="fig-j2under" data-under="J2.1 J2.2 J2.3 J2.4 TP2" data-parts="U1.20 U1.21"><span class="t">Measure each J2 pin to GND (TP2) at its solder joint.</span>
+      <div class="expect"><b>Expected on J2</b>
+        <table><tr><td>Pin 1 (PB)</td><td class="num">≈ 10 V</td></tr>
+        <tr><td>Pin 2 (GND)</td><td class="num">0 V</td></tr>
+        <tr><td>Pin 3 (data line, body → head)</td><td class="num">≈ 5 V</td></tr>
+        <tr><td>Pin 4 (data line, head → body)</td><td class="num">≈ 0 V or floating (U1 out) · ≈ 5 V (U1 in, programmed)</td></tr>
+        <tr><td>Socket pin 20 to 21</td><td class="num">5.0 V</td></tr></table>
+      </div>
+      <div class="stop"><b>STOP</b><span>If 10 V appears on any pin other than pin 1, unplug the radio and don't connect the head. Check the jacks and cable before anything else.</span></div>
+    </li>
+  </ol>
+
+  <h3>D · Bypass with the head</h3>
+  <ol class="steps">
+    <li class="step" data-id="d-run" data-parts="JP1 J2"><span class="t">Radio off. Fit the JP1 shunt (U1 still out). Plug the head cable into J2. Radio on.</span>
+      <div class="expect"><b>Expected</b><span>The radio works normally: display, keys, brightness. This is a pure bypass.</span></div>
+      <div class="warn"><b>⚠️ JP1 rule.</b> Fit the JP1 shunt only with U1 removed. With the AVR running it fights the body's data line.</div>
+    </li>
+  </ol>
+
+  <h3>E · Protocol capture</h3>
+  <ol class="steps">
+    <li class="step" data-id="e-wire" data-parts="TP2 J4.1 R6.2 R7.2"><span class="t">Same state as D (or U1 in with the forward-only firmware, JP1 parked). Connect the logic analyzer.</span>
+      <div class="tw"><table>
+        <thead><tr><th>Analyzer</th><th>Board point</th><th>Signal</th></tr></thead>
+        <tbody>
+          <tr><td class="num">GND</td><td>TP2 or J4 pin 1</td><td>Ground</td></tr>
+          <tr><td class="num">CH0</td><td>R6 right lead (x 13.16)</td><td>TAP_BODY, body → head</td></tr>
+          <tr><td class="num">CH1</td><td>R7 right lead (x 26.16)</td><td>TAP_HEAD, head → body</td></tr>
+        </tbody>
+      </table></div>
+      <span class="dim small">The 10 kΩ in series limits current into the analyzer. With U1 out, each side of the resistor carries the same signal.</span>
+    </li>
+    <li class="step" data-id="e-pv"><span class="t">PulseView: sample at 1–2 MHz. Add a UART decoder on each channel: 57,600 baud, 8N1, idle high, hex output.</span></li>
+    <li class="step" data-id="e-cap"><span class="t">Record: radio power-on; key presses; stepping brightness through the menu; a minute of idle.</span>
+      <div class="expect"><b>Look for</b><span>Brightness messages <code>33 3x 0D</code> on CH0, where <code>3x</code> is <code>30</code>–<code>38</code> (ASCII '0'–'8').</span></div>
+      <div class="note small"><span><b>Framing errors?</b> The baud rate is wrong. Measure the narrowest bit width with the cursors: 17.4 µs means 57,600.</span></div>
+    </li>
+    <li class="step" data-id="e-save"><span class="t">Save the capture (.sr) and ask Claude to review it.</span><span class="dim small">This confirms the protocol constants before full firmware goes in.</span></li>
+  </ol>
+</section>
+
+<!-- 9 UPDI -->
+<section id="updi">
+  <div class="sec-head"><span class="sec-num">9</span><h2>DIY SerialUPDI programmer</h2><span class="sec-prog" data-sec="updi"></span></div>
+  <p>One CH340 module and a 2.2 kΩ resistor stand in for a UPDI Friend.</p>
+<template id="fig-updi"><svg class="wd" viewBox="0 0 120 58" role="img" aria-label="Programmer wiring: CH340 TX to breadboard row A, 2.2 kilohm from row A to row B, CH340 RX to row B, row B to J4 pin 2 UPDI, CH340 GND to J4 pin 1, CH340 5V not connected">
+  <text class="ref" x="3" y="7">CH340 #1 · jumper on 5V</text>
+  <rect class="bodyf" x="3" y="10" width="26" height="42" rx="1"/>
+  <text x="26.5" y="17.9" text-anchor="end">5V/VCC</text><text x="26.5" y="27.9" text-anchor="end">TX</text>
+  <text x="26.5" y="37.9" text-anchor="end">RX</text><text x="26.5" y="47.9" text-anchor="end">GND</text>
+  <circle class="pad" cx="29" cy="17" r="1"/><circle class="pad" cx="29" cy="27" r="1"/><circle class="pad" cx="29" cy="37" r="1"/><circle class="pad" cx="29" cy="47" r="1"/>
+  <line class="wire nc" x1="29" y1="17" x2="36" y2="17"/>
+  <path class="xmark" d="M36 15.6 L38.8 18.4 M38.8 15.6 L36 18.4"/>
+  <text class="s warn" x="41" y="17.8">not connected</text>
+  <text class="s" x="59" y="20.6" text-anchor="middle">breadboard</text>
+  <rect class="bb" x="44" y="22" width="30" height="19" rx="1"/>
+  <line class="strip" x1="46" y1="27" x2="72" y2="27"/><line class="strip" x1="46" y1="37" x2="72" y2="37"/>
+  <text class="s" x="46.5" y="25.4">row A</text><text class="s" x="46.5" y="40.2">row B</text>
+  <line class="lead" x1="64" y1="27" x2="64" y2="37"/>
+  <rect class="bodyf hl" x="62.6" y="29" width="2.8" height="6" rx=".6"/>
+  <text class="ref" x="67" y="32.9">2.2 kΩ</text>
+  <line class="wire" x1="29" y1="27" x2="49" y2="27"/><line class="wire" x1="29" y1="37" x2="49" y2="37"/>
+  <line class="wire updi" x1="70" y1="37" x2="95" y2="37"/>
+  <text class="s" x="83" y="35.4" text-anchor="middle">M-F jumper</text>
+  <line class="wire gnd" x1="29" y1="47" x2="95" y2="47"/>
+  <text class="s" x="83" y="45.4" text-anchor="middle">F-F jumper</text>
+  <text class="ref" x="97" y="20.6" text-anchor="middle">board J4</text>
+  <rect class="body" x="92.5" y="23.5" width="5" height="27" rx=".5"/>
+  <circle class="pad dimmed" cx="95" cy="27" r="1"/><circle class="pad" cx="95" cy="37" r="1"/><rect class="p1" x="94" y="46" width="2" height="2"/>
+  <text class="s" x="99" y="27.8">3 TX (logger)</text><text x="99" y="37.9">2 UPDI</text><text x="99" y="47.9">1 GND</text>
+  <text class="s" x="60" y="56" text-anchor="middle">Board power: bench supply (10 V on R1's left lead) or the radio. Never the adapter.</text>
+</svg></template>
+<template id="fig-j2under"><svg class="wd" viewBox="0 0 120 64" role="img" aria-label="J2 seen from the underside: from left to right pin 4 (lower), pin 3 (upper), pin 2 (lower), pin 1 square (upper). J1 is to the right.">
+  <line class="strip" x1="2" y1="5" x2="118" y2="5"/>
+  <text class="s" x="60" y="3.2" text-anchor="middle">board edge (top) · cables plug in here</text>
+  <rect class="body" x="14" y="7" width="76" height="50" rx="1"/>
+  <text class="ref" x="17" y="12">J2 HEAD · seen from UNDERNEATH</text>
+  <circle class="peg" cx="20" cy="30" r="3"/><circle class="peg" cx="84" cy="30" r="3"/>
+  <text class="s" x="104" y="28" text-anchor="middle">J1 BODY</text>
+  <text class="s" x="104" y="31.5" text-anchor="middle">is this way →</text>
+  <circle class="pad" cx="38" cy="43" r="3"/><circle class="pad" cx="48" cy="22" r="3"/>
+  <circle class="pad" cx="58" cy="43" r="3"/><rect class="p1" x="65" y="19" width="6" height="6"/>
+  <text class="ref" x="68" y="15.5" text-anchor="middle">1 · PB</text><text x="68" y="31" text-anchor="middle">≈ 10 V</text>
+  <text class="ref" x="48" y="15.5" text-anchor="middle">3 · to head</text><text x="48" y="31" text-anchor="middle">≈ 5 V</text>
+  <text class="ref" x="58" y="51" text-anchor="middle">2 · GND</text><text x="58" y="55" text-anchor="middle">0 V</text>
+  <text class="ref" x="35" y="51" text-anchor="middle">4 · from head</text><text x="35" y="55" text-anchor="middle">≈ 5 V</text>
+  <text class="s warn" x="60" y="62" text-anchor="middle">Square pad = pin 1. 10 V anywhere except pin 1: stop.</text>
+</svg></template>
+<template id="fig-log"><svg class="wd" viewBox="0 0 120 58" role="img" aria-label="Logger wiring: second CH340 RX to J4 pin 3, its GND and the programmer GND to a breadboard ground row, ground row to J4 pin 1">
+  <text class="ref" x="3" y="7">CH340 #2 · jumper on 5V</text>
+  <rect class="bodyf" x="3" y="10" width="26" height="42" rx="1"/>
+  <text x="26.5" y="17.9" text-anchor="end">5V/VCC</text><text x="26.5" y="27.9" text-anchor="end">RX</text>
+  <text x="26.5" y="37.9" text-anchor="end">TX</text><text x="26.5" y="47.9" text-anchor="end">GND</text>
+  <circle class="pad" cx="29" cy="17" r="1"/><circle class="pad" cx="29" cy="27" r="1"/><circle class="pad" cx="29" cy="37" r="1"/><circle class="pad" cx="29" cy="47" r="1"/>
+  <text class="s warn" x="32" y="17.8">5V and TX: not connected</text>
+  <line class="wire updi" x1="29" y1="27" x2="95" y2="27"/>
+  <text class="s" x="62" y="25.4" text-anchor="middle">M-F jumper</text>
+  <text class="s" x="59" y="40.6" text-anchor="middle">breadboard GND row</text>
+  <rect class="bb" x="44" y="42" width="30" height="9" rx="1"/>
+  <line class="strip" x1="46" y1="47" x2="72" y2="47"/>
+  <line class="wire gnd" x1="29" y1="47" x2="49" y2="47"/>
+  <line class="wire gnd" x1="60" y1="55" x2="60" y2="47"/>
+  <text class="s" x="62" y="56.4">CH340 #1 (programmer) GND</text>
+  <line class="wire gnd" x1="70" y1="47" x2="95" y2="47"/>
+  <text class="s" x="83" y="45.4" text-anchor="middle">F-F jumper</text>
+  <text class="ref" x="97" y="20.6" text-anchor="middle">board J4</text>
+  <rect class="body" x="92.5" y="23.5" width="5" height="27" rx=".5"/>
+  <circle class="pad" cx="95" cy="27" r="1"/><circle class="pad dimmed" cx="95" cy="37" r="1"/><rect class="p1" x="94" y="46" width="2" height="2"/>
+  <text x="99" y="27.9">3 TX</text><text class="s" x="99" y="37.8">2 UPDI</text><text x="99" y="47.9">1 GND</text>
+</svg></template>
+  <div class="fig-slot" data-fig="fig-updi"></div>
+  <ol class="steps">
+    <li class="step" data-id="u-jump" data-fig="fig-updi"><span class="t">Set the CH340 jumper to 5V. Plug it in and measure TX to GND.</span>
+      <div class="expect"><b>Expected</b><span>TX idles at ≈ 5 V.</span></div>
+    </li>
+    <li class="step" data-id="u-build" data-fig="fig-updi"><span class="t">Build the breadboard as drawn: 2.2 kΩ (a spare R9) between the TX row and the RX row.</span></li>
+    <li class="step" data-id="u-wire" data-parts="J4.1 J4.2" data-fig="fig-updi"><span class="t">RX row to J4 pin 2 (M-F jumper). Adapter GND to J4 pin 1 (F-F jumper).</span>
+      <div class="warn"><b>⚠️ Power.</b> Leave the adapter's VCC/5V pin unconnected. The board is powered by the radio or the bench supply (10 V on R1's left lead), never by the adapter.</div>
+    </li>
+  </ol>
+  <div class="note small"><span><b>If you get "UPDI initialisation failed":</b> first check the adapter's GND really goes to J4 pin 1 (not DTR or CTS next to it). Then run <code>tools/serial_loopback.py PORT</code> with TXD and RXD joined: it must echo cleanly at every speed. The first build's CH340 modules failed this (their receive side didn't work); an FT232 adapter passed and programmed the board. See <code>firmware/PROGRAMMING_HANDOFF.md</code>.</span></div>
+  <div class="note small"><span><b>If flashing is flaky:</b> ask Claude to make the slow 57,600 baud mode selectable, or replace the resistor with a small-signal Schottky (BAT43 or BAT85), cathode toward TX. A 1N4148 won't work.</span></div>
+</section>
+
+<!-- 10 FLASH -->
+<section id="flash">
+  <div class="sec-head"><span class="sec-num">10</span><h2>Flash and log</h2><span class="sec-prog" data-sec="flash"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="f-shunt" data-parts="JP1"><span class="t">Radio off. Remove the JP1 shunt and park it on one pin.</span></li>
+    <li class="step" data-id="f-avr" data-parts="U1"><span class="t">Straighten the AVR's legs to 0.3 in by rolling each row against the bench. Insert it.</span>
+      <div class="warn"><b>⚠️ Orientation.</b> AVR notch to the LEFT, matching the socket. Wrist strap on.</div>
+    </li>
+    <li class="step" data-id="f-conn"><span class="t">Connect the programmer (section 9), body and head cables. Radio on. Find the port.</span><pre><code>ls /dev/cu.*      # /dev/cu.usbserial-XXXX or /dev/cu.wchusbserial…</code></pre></li>
+    <li class="step" data-id="f-fuses"><span class="t">Set fuses, once per new chip.</span><pre><code>make fuses PORT=/dev/cu.usbserial-XXXX</code></pre><span class="dim small">Sets 1 ms startup, 2.85 V brown-out, and keeps EEPROM across reflashes.</span></li>
+    <li class="step" data-id="f-fwd"><span class="t">Flash the forward-only firmware.</span><pre><code>make flash-forward PORT=/dev/cu.usbserial-XXXX</code></pre>
+      <div class="expect"><b>Expected</b><span>The radio behaves exactly as in bypass (test D).</span></div>
+      <div class="stop"><b>STOP</b><span>If the display freezes or garbles, pull U1, fit the JP1 shunt and ask Claude before going further.</span></div>
+    </li>
+    <li class="step" data-id="f-logwire" data-parts="J4.1 J4.3" data-fig="fig-log"><span class="t">Logging: the FT232 (jumper on 5V). RX to J4 pin 3, GND to J4 pin 1, nothing on TX.</span><span class="dim small">Both adapters share J4 pin 1: bring it to a breadboard GND row and connect both GNDs there.</span>
+      <div class="warn"><b>⚠️ RX and GND only.</b> Leave the logging adapter's TXD unconnected, and don't reuse the programmer's row B with its TXD still feeding the 2.2 kΩ. An idle-high TXD back-powers the AVR through its pin whenever the board's supply is off, and the log fills with partial <code>KP </code> lines from brown-out resets.</div><pre><code>make log LOGPORT=/dev/cu.usbserial-A50285BI</code></pre></li>
+    <li class="step" data-id="f-full"><span class="t">Full firmware, only after Claude confirms the protocol constants from your capture.</span><pre><code>make flash PORT=/dev/cu.usbserial-XXXX</code></pre></li>
+    <li class="step" data-id="f-verify" data-parts="J3"><span class="t">Verify: set brightness by day, toggle ILL (bench supply on J3), set it by night, cycle radio power. Watch the log.</span></li>
+  </ol>
+  <div class="tw"><table>
+    <thead><tr><th>Log line</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="num">KP v1 rw=1 d=6 n=2 b=6 n</td><td>Startup: rewrite on, day slot 6, night slot 2, body's last level 6, lights on (<code>n</code>)</td></tr>
+      <tr><td class="num">M n / M d</td><td>Lights changed to night / day</td></tr>
+      <tr><td class="num">L n 3</td><td>Learned level 3 for night</td></tr>
+      <tr><td class="num">R 6 2</td><td>Body sent 6, head got 2</td></tr>
+      <tr><td class="num">I n 2</td><td>Inserted level 2 for night</td></tr>
+      <tr><td class="num">W</td><td>EEPROM written</td></tr>
+      <tr><td class="num">X 1 / X 0</td><td>2 s after start: 32 kHz crystal running / not running. On <code>X 0</code>, check Y1's joints or fit the spare crystal.</td></tr>
+      <tr><td class="num">O</td><td>Head queue overflow (should never appear)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 11 CASE -->
+<section id="case">
+  <div class="sec-head"><span class="sec-num">11</span><h2>Enclosure</h2><span class="sec-prog" data-sec="case"></span></div>
+  <div class="warn"><b>⚠️ Firmware first.</b> J4 and JP1 are sealed inside the case. Finish flashing and logging before you close it.</div>
+  <ol class="steps">
+    <li class="step" data-id="k-h"><span class="t">J3 height confirmed (or case regenerated). Print base and cover in PETG or ASA.</span></li>
+    <li class="step" data-id="k-fit"><span class="t">Set the board on the base standoffs and lower the cover over the connectors.</span></li>
+    <li class="step" data-id="k-screw"><span class="t">Drive 4 × M3 × 16 from below into the 12 mm pilots (about 8.4 mm of engagement).</span><span class="dim small">They cut their own thread in plastic: snug, then stop.</span></li>
+    <li class="step" data-id="k-soak"><span class="t">Optional: run it in the case on the bench for an hour with the logger off, then check that nothing is warm and the radio still behaves.</span></li>
+    <li class="step" data-id="k-install" data-parts="J1 J2 J3"><span class="t">Install: body cable to J1, head cable to J2, ILL plug to J3.</span></li>
+  </ol>
+</section>
+
+<!-- RECOVERY -->
+<section id="recovery">
+  <div class="stop"><b>Recovery</b>
+    <ul class="plain">
+      <li><b>Hard bypass:</b> pull U1 and fit the JP1 shunt. The radio runs as if the board weren't there.</li>
+      <li><b>Known-good coupler:</b> a spare board fitted with only J1, J2 and a JP1 shunt.</li>
+      <li><b>Store-bought RJ couplers:</b> many are reversed (1→4), which puts PB on the head's RX pin. Check continuity pin for pin before using one.</li>
+    </ul>
+  </div>
+</section>
+</main>
+
+<div class="focus" id="focus" hidden role="dialog" aria-modal="true" aria-labelledby="f-title">
+  <div class="f-top"><div class="f-row">
+    <span class="f-sec" id="f-sec"></span><span class="f-pos" id="f-pos"></span>
+    <button class="btn" id="f-close" type="button">Close (Esc)</button>
+  </div></div>
+  <div class="f-main" id="f-main"><div class="f-grid">
+    <div class="f-map" id="f-map"></div>
+    <div class="f-body" id="f-body">
+      <div class="t" id="f-title"></div>
+      <div id="f-content" style="display: grid; gap: .6rem"></div>
+    </div>
+  </div></div>
+  <div class="f-bot"><div class="f-row">
+    <button class="btn" id="f-prev" type="button">◀ Prev</button>
+    <label class="f-check"><input type="checkbox" id="f-done"> Done</label>
+    <span class="spacer"></span>
+    <span class="f-keys"><kbd>←</kbd> <kbd>→</kbd> move · <kbd>D</kbd> done</span>
+    <button class="btn" id="f-next" type="button">Next ▶</button>
+    <button class="btn primary" id="f-donenext" type="button">Done, next ▶</button>
+  </div></div>
+</div>
+
+<script>
+(function () {
+  var KEY = 'kp-guide-progress-v1';
+  var POS = 'kp-guide-focus-step';
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { state = {}; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  var ns = 'http://www.w3.org/2000/svg';
+
+  // U1 socket pads. Pin 1 (square) is in the markup. Bottom row: pins 1-14 left to right; top row: 15-28 right to left.
+  var g = document.getElementById('u1pins');
+  if (g) {
+    for (var i = 0; i < 14; i++) {
+      var x = 6 + 2.54 * i;
+      [[36, i + 1], [28.38, 28 - i]].forEach(function (rp) {
+        if (rp[1] === 1) return;
+        var c = document.createElementNS(ns, 'circle');
+        c.setAttribute('class', 'pad'); c.setAttribute('cx', x.toFixed(2)); c.setAttribute('cy', rp[0]); c.setAttribute('r', '.7');
+        c.setAttribute('data-pin', rp[1]);
+        g.appendChild(c);
+      });
+    }
+  }
+
+  // Copy of the board map with the given parts highlighted.
+  // Tokens: "R6" highlights a part; "R1.1" highlights the part and rings its pin 1.
+  var master = document.querySelector('#map svg');
+  function buildMap(spec, under) {
+    var svg = master.cloneNode(true);
+    svg.querySelectorAll('defs, title').forEach(function (n) { n.remove(); });
+    svg.querySelectorAll('[id]').forEach(function (n) { n.removeAttribute('id'); });
+    svg.removeAttribute('aria-labelledby');
+    svg.classList.add('hl');
+    var names = [];
+    spec.trim().split(/\s+/).forEach(function (tok) {
+      var bits = tok.split('.'), ref = bits[0], pin = bits[1];
+      var part = svg.querySelector('[data-part="' + ref + '"]');
+      if (!part) return;
+      part.classList.add('on');
+      names.push(pin ? ref + ' pin ' + pin : ref);
+      if (!pin) return;
+      var el = part.querySelector('[data-pin="' + pin + '"]');
+      if (!el) return;
+      var cx, cy;
+      if (el.tagName.toLowerCase() === 'rect') {
+        cx = +el.getAttribute('x') + el.getAttribute('width') / 2; cy = +el.getAttribute('y') + el.getAttribute('height') / 2;
+      } else { cx = +el.getAttribute('cx'); cy = +el.getAttribute('cy'); }
+      var r = document.createElementNS(ns, 'circle');
+      r.setAttribute('class', 'ring'); r.setAttribute('cx', cx); r.setAttribute('cy', cy); r.setAttribute('r', (ref === 'J1' || ref === 'J2') ? '1.05' : '1.5');
+      svg.appendChild(r);
+      if (ref === 'U1' || ref === 'J1' || ref === 'J2') {
+        var t = document.createElementNS(ns, 'text');
+        t.setAttribute('class', 'ringlab'); t.setAttribute('x', cx); t.setAttribute('text-anchor', 'middle');
+        if (ref === 'U1') t.setAttribute('y', cy < 32 ? cy - 2 : cy + 3.1);
+        else t.setAttribute('y', cy < 9.5 ? cy - 1.9 : cy + 2.9);
+        t.textContent = pin;
+        svg.appendChild(t);
+      }
+    });
+    if (under) {
+      // Solder-side view: mirror left-right (board flipped like a page, connector edge still on top).
+      // Text is flipped back so it stays readable, and its anchor swaps sides.
+      var gm = document.createElementNS(ns, 'g');
+      gm.setAttribute('transform', 'translate(54 0) scale(-1 1)');
+      while (svg.firstChild) gm.appendChild(svg.firstChild);
+      svg.appendChild(gm);
+      gm.querySelectorAll('text').forEach(function (t) {
+        var x = +t.getAttribute('x') || 0, prev = t.getAttribute('transform') || '';
+        t.setAttribute('transform', 'translate(' + (2 * x) + ' 0) scale(-1 1) ' + prev);
+        var a = t.getAttribute('text-anchor');
+        t.setAttribute('text-anchor', a === 'end' ? 'start' : a === 'middle' ? 'middle' : 'end');
+        if (t.classList.contains('edge')) t.textContent = 'TOP EDGE · UNDERSIDE (solder side), mirrored';
+      });
+    }
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', (under ? 'Underside view, mirrored, with ' : 'Board map with ') + names.join(', ') + ' highlighted');
+    var wrap = document.createElement('div'); wrap.className = 'stepmap';
+    var cap = document.createElement('div'); cap.className = 'maplabel';
+    cap.textContent = under ? 'UNDERSIDE: flip the board left-to-right like a page; the connector edge stays at the top'
+                            : 'TOP (component side)';
+    wrap.appendChild(cap);
+    wrap.appendChild(svg);
+    return wrap;
+  }
+
+  // Wiring diagrams live in <template> elements; steps name one with data-fig.
+  function buildFig(id) {
+    var tpl = document.getElementById(id);
+    var wrap = document.createElement('div'); wrap.className = 'stepmap';
+    if (tpl) wrap.appendChild(tpl.content.firstElementChild.cloneNode(true));
+    return wrap;
+  }
+  document.querySelectorAll('.fig-slot').forEach(function (slot) { slot.appendChild(buildFig(slot.dataset.fig)); });
+
+  var steps = Array.prototype.slice.call(document.querySelectorAll('main li.step'));
+  steps.forEach(function (li, idx) {
+    var id = 'cb-' + li.dataset.id;
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.id = id; cb.checked = !!state[li.dataset.id];
+    var c = document.createElement('div'); c.className = 'c';
+    while (li.firstChild) c.appendChild(li.firstChild);
+    var t = c.querySelector('.t');
+    if (t) { var lab = document.createElement('label'); lab.htmlFor = id; lab.className = 't'; lab.innerHTML = t.innerHTML; t.replaceWith(lab); }
+    // Soldering steps show their own highlighted map in the list too.
+    if (li.dataset.under) c.appendChild(buildMap(li.dataset.under, true));
+    if (li.dataset.parts && (li.closest('#solder') || li.dataset.under)) c.appendChild(buildMap(li.dataset.parts));
+    if (li.dataset.fig) c.appendChild(buildFig(li.dataset.fig));
+    var go = document.createElement('button');
+    go.type = 'button'; go.className = 'go'; go.textContent = 'Open in step-by-step view';
+    go.addEventListener('click', function () { openFocus(idx); });
+    c.appendChild(go);
+    li.appendChild(cb); li.appendChild(c);
+    li.classList.toggle('done', cb.checked);
+    cb.addEventListener('change', function () { setDone(li, cb.checked); });
+  });
+
+  function setDone(li, on) {
+    var cb = li.querySelector('input');
+    cb.checked = on;
+    if (on) state[li.dataset.id] = 1; else delete state[li.dataset.id];
+    li.classList.toggle('done', on); save(); update();
+    if (!focus.hidden && steps[cur] === li) renderFocus();
+  }
+
+  function update() {
+    var done = steps.filter(function (li) { return li.querySelector('input').checked; }).length;
+    document.getElementById('count').textContent = done + ' / ' + steps.length + ' steps';
+    document.getElementById('meter').style.width = (steps.length ? 100 * done / steps.length : 0) + '%';
+    document.querySelectorAll('.sec-prog').forEach(function (el) {
+      var sec = document.getElementById(el.dataset.sec);
+      var s = sec.querySelectorAll('li.step'), d = sec.querySelectorAll('li.step > input:checked');
+      el.textContent = d.length + ' / ' + s.length;
+    });
+  }
+  update();
+
+  // ---- step-by-step view ----
+  var focus = document.getElementById('focus');
+  var fSec = document.getElementById('f-sec'), fPos = document.getElementById('f-pos');
+  var fMap = document.getElementById('f-map'), fBody = document.getElementById('f-body');
+  var fTitle = document.getElementById('f-title'), fContent = document.getElementById('f-content');
+  var fDone = document.getElementById('f-done'), fMain = document.getElementById('f-main');
+  var cur = 0, opener = null;
+
+  function sectionName(li) {
+    var sec = li.closest('section');
+    var num = sec.querySelector('.sec-num'), h = sec.querySelector('h2');
+    var name = (num ? num.textContent + ' · ' : '') + (h ? h.textContent : '');
+    var sub = li.closest('ol, ul').previousElementSibling;
+    if (sub && sub.tagName === 'H3') name += ' · ' + sub.textContent;
+    return name;
+  }
+
+  function renderFocus() {
+    var li = steps[cur];
+    var on = li.querySelector('input').checked;
+    fSec.textContent = sectionName(li);
+    fPos.textContent = 'Step ' + (cur + 1) + ' / ' + steps.length;
+    var src = li.querySelector('.c');
+    fTitle.innerHTML = src.querySelector('.t').innerHTML;
+    fContent.innerHTML = '';
+    Array.prototype.forEach.call(src.children, function (n) {
+      if (n.classList.contains('t') || n.classList.contains('stepmap') || n.classList.contains('go')) return;
+      fContent.appendChild(n.cloneNode(true));
+    });
+    fMap.innerHTML = '';
+    fMap.hidden = !li.dataset.parts && !li.dataset.fig && !li.dataset.under;
+    if (li.dataset.fig) fMap.appendChild(buildFig(li.dataset.fig));
+    if (li.dataset.under) fMap.appendChild(buildMap(li.dataset.under, true));
+    if (li.dataset.parts) fMap.appendChild(buildMap(li.dataset.parts));
+    fDone.checked = on;
+    fBody.classList.toggle('done', on);
+    document.getElementById('f-prev').disabled = cur === 0;
+    document.getElementById('f-next').disabled = cur === steps.length - 1;
+    document.getElementById('f-donenext').textContent = cur === steps.length - 1 ? 'Done' : 'Done, next ▶';
+    try { localStorage.setItem(POS, li.dataset.id); } catch (e) {}
+  }
+
+  function go(i) {
+    cur = Math.max(0, Math.min(steps.length - 1, i));
+    renderFocus(); fMain.scrollTop = 0;
+  }
+
+  function openFocus(i) {
+    if (i == null) {
+      var saved = null;
+      try { saved = localStorage.getItem(POS); } catch (e) {}
+      i = steps.findIndex(function (li) { return li.dataset.id === saved; });
+      if (i < 0) i = steps.findIndex(function (li) { return !li.querySelector('input').checked; });
+      if (i < 0) i = 0;
+    }
+    opener = document.activeElement;
+    focus.hidden = false;
+    document.body.style.overflow = 'hidden';
+    go(i);
+    document.getElementById('f-donenext').focus();
+  }
+
+  function closeFocus() {
+    focus.hidden = true;
+    document.body.style.overflow = '';
+    var li = steps[cur];
+    li.scrollIntoView({ block: 'center' });
+    var target = li.querySelector('.go') || opener;
+    if (target) target.focus({ preventScroll: true });
+  }
+
+  document.getElementById('focus-btn').addEventListener('click', function () { openFocus(); });
+  document.querySelectorAll('a.stepln').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var i = steps.findIndex(function (li) { return li.dataset.id === a.dataset.step; });
+      if (i >= 0) openFocus(i);
+    });
+  });
+  // Steps confirmed done in the 2026-11-14 session.
+  var DONE_1114 = ['p-esd','p-pdf','p-jacks','p-dry','p-sort','p-res',
+    's-r-10k','s-r-470','s-r-680','s-r9','s-r1','s-d1','s-y1','s-y1-check','s-socket','s-u3','s-c104','s-c150',
+    's-headers','s-u2','s-c4','s-c6','s-j3','s-jacks','c-trim','c-clean','c-short','j-fit','j-id',
+    'c-inspect','k-h','a-set','a-wire','b-on','b-off','u-jump','u-build','u-wire','f-shunt','f-avr','f-conn','f-fuses','f-logwire'];
+  var md = document.getElementById('mark-done');
+  if (md) md.addEventListener('click', function () {
+    var n = 0;
+    steps.forEach(function (li) {
+      if (DONE_1114.indexOf(li.dataset.id) >= 0 && !li.querySelector('input').checked) { setDone(li, true); n++; }
+    });
+    document.getElementById('mark-done-msg').textContent = n ? 'Ticked ' + n + ' steps.' : 'Already ticked.';
+  });
+  document.getElementById('f-close').addEventListener('click', closeFocus);
+  document.getElementById('f-prev').addEventListener('click', function () { go(cur - 1); });
+  document.getElementById('f-next').addEventListener('click', function () { go(cur + 1); });
+  fDone.addEventListener('change', function () { setDone(steps[cur], fDone.checked); });
+  document.getElementById('f-donenext').addEventListener('click', function () {
+    setDone(steps[cur], true);
+    if (cur < steps.length - 1) go(cur + 1);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (focus.hidden || e.metaKey || e.ctrlKey || e.altKey) return;
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (e.key === 'Escape') { e.preventDefault(); closeFocus(); }
+    else if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
+    else if ((e.key === 'd' || e.key === 'D') && tag !== 'input') { e.preventDefault(); setDone(steps[cur], !steps[cur].querySelector('input').checked); }
+    else if (e.key === 'Tab') {
+      // keep keyboard focus inside the view
+      var f = Array.prototype.filter.call(focus.querySelectorAll('button, input, a[href]'), function (n) { return !n.disabled && n.offsetParent !== null; });
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  var rw = document.getElementById('reset-wrap'), cw = document.getElementById('confirm-wrap');
+  document.getElementById('reset-btn').addEventListener('click', function () { rw.hidden = true; cw.hidden = false; document.getElementById('reset-no').focus(); });
+  document.getElementById('reset-no').addEventListener('click', function () { cw.hidden = true; rw.hidden = false; });
+  document.getElementById('reset-yes').addEventListener('click', function () {
+    state = {}; save();
+    steps.forEach(function (li) { li.querySelector('input').checked = false; li.classList.remove('done'); });
+    update(); cw.hidden = true; rw.hidden = false;
+  });
+
+  var tb = document.getElementById('theme-btn'), root = document.documentElement;
+  function label() { tb.textContent = root.getAttribute('data-theme') === 'light' ? 'Dark' : 'Light'; }
+  label();
+  tb.addEventListener('click', function () {
+    var n = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', n);
+    try { localStorage.setItem('kp-guide-theme', n); } catch (e) {}
+    label();
+  });
+})();
+</script>

@@ -1,6 +1,6 @@
-# Enclosure
+# Kenwood proxy Rev A enclosure
 
-This is a two-piece printed case for the 54 × 52 mm board. The front wall has openings for **J1 (BODY)**, **J2 (HEAD)** and **J3 (ILL, Micro-Fit)**. J4 (programming), J5 (data taps) and JP1 are fully enclosed, so the board only goes in the case once the firmware is final.
+This is a two-piece printed case for the 54 × 52 mm board. The front wall has openings for **J1 (BODY)**, **J2 (HEAD)** and **J3 (ILL, Micro-Fit)**. J4 (programming) and JP1 are fully enclosed: the board only goes in the case once the firmware is final.
 
 | File | Purpose |
 |---|---|
@@ -17,12 +17,11 @@ This is a two-piece printed case for the 54 × 52 mm board. The front wall has o
 - **Below the board:** 4 mm, for trimmed leads and connector pegs.
 - **Above the board:** 16 mm. The tallest part is the 4P4C jack at 14.5 mm.
 - **Openings:** 0.5 mm clearance around each connector face. Connector faces sit 2.5 mm behind the outside of the front wall, which leaves the 4P4C latches and the Micro-Fit release lever outside the case where you can press them.
-- **Proven fit:** a printed case fits an assembled Rev A board, which has the same outline, connectors and J3 height. Rev B adds only J5 inside the case, and the generator's fit check covers it.
 - **Fit check:** the generator checks the case against envelopes of every tall part, the board outline and each connector face. The result is **PASS** (`build_report.txt`).
 
 ## Before printing: measure J3
 
-The J3 opening is sized for a Micro-Fit 43045-0200 header **10.3 mm tall**, from Molex's 10.29 mm mated height, plus 3 mm above it for the plug's latch lever and a fingertip. Measure your header with calipers before printing. If it differs, change `MICROFIT_H` in `build_enclosure.py` and re-run:
+The J3 opening is sized for a Micro-Fit 43045-0200 header **10.3 mm tall**, from Molex's 10.29 mm mated height, plus 3 mm above it for the plug's latch lever and a fingertip. When the DigiKey parts arrive, measure the real header with calipers. If it differs, change `MICROFIT_H` in `build_enclosure.py` and re-run:
 
 ```sh
 /Applications/FreeCAD.app/Contents/Resources/bin/freecadcmd build_enclosure.py
@@ -42,6 +41,6 @@ The 4P4C jack height (14.5 mm) comes from Würth's datasheet.
 
 ## Hardware and assembly
 
-- **4 × M3 × 14 mm or 16 mm screws** (pan or socket head). They go in from underneath, through the base standoffs and the board's mounting holes, and thread into 2.6 mm pilot holes in the cover posts, about 6.4 mm of thread engagement for 14 mm screws and 8.4 mm for 16 mm (the pilots are 12 mm deep). Ordinary machine screws cut their own thread in PETG, or use thread-forming screws for plastic. There are no counterbores: the heads sit about 2–3 mm proud of the underside, which keeps each standoff joined to a solid floor.
+- **4 × M3 × 14 mm screws** (pan or socket head). They go in from underneath, through the base standoffs and the board's mounting holes, and thread into 2.6 mm pilot holes in the cover posts, about 6.4 mm of engagement. Ordinary machine screws cut their own thread in PETG, or use thread-forming screws for plastic. There are no counterbores: the heads sit about 2–3 mm proud of the underside, which keeps each standoff joined to a solid floor.
 - **Assembly:** set the board on the base standoffs, lower the cover over the connectors (the lip around the base locates it), then screw from below. The cover posts clamp the board onto the standoffs.
 - **Mounting:** none needed; it can sit in the wiring bundle. If it rattles, wrap it with the bundle in fabric harness tape, or put thick foam tape or Velcro pads on the base between the screw heads.

@@ -45,7 +45,6 @@ pos = {
  'R11': (51.5, 40.0, 90),
  'R13': (19.0, 39.8, 0),
  'J4': (10.0, 46.0, 90),    # 1x3 0.1 in header, pins left to right GND UPDI TX
- 'J5': (3.0, 16.5, 90),     # Rev B: 1x4 data-tap header, pins left to right GND B>H H>B HRX
  # power: bottom right
  'R1': (32.2, 42.5, 0), 'C6': (19.0, 48.5, 0), 'C5': (24.5, 48.5, 0), 'U2': (36.5, 48.5, 180), 'C4': (40.5, 48.5, 0),
  'TP2': (46.5, 37.4, 0),
@@ -53,7 +52,7 @@ pos = {
  'J3': (39.5, 9.42, 0), 'R9': (52.1, 15.8, 180), 'U3': (52.3, 19.5, 270), 'R10': (39.4, 19.3, 0), 'D1': (39.4, 22.3, 0),
  **{f'H{i+1}': (hx, hy, 0) for i, (hx, hy) in enumerate(HOLES)},
 }
-SILK_REFS = {'J1','J2','J3','J4','J5','JP1','U1','U2','U3','Y1'}
+SILK_REFS = {'J1','J2','J3','J4','JP1','U1','U2','U3','Y1'}
 
 fps = {}
 for el in xml.findall('./components/comp'):
@@ -93,7 +92,7 @@ for el in xml.findall('./components/comp'):
         r.SetTextSize(v(.8, .8))
     else:
         r.SetPosition(v(p.ToMM(bb.Centre().x), p.ToMM(bb.GetTop()) - 0.9))
-    override = {'J1': (4.6, 11.4), 'J2': (33.4, 11.4), 'U1': (22.5, 32.2), 'J3': (45.3, 5.2), 'J4': (7.4, 46.0), 'C3': (10.8, 39.8), 'C4': (46.0, 48.5), 'C2': (42.5, 37.4), 'R11': (48.6, 32.6), 'JP1': (17.8, 22.9), 'C6': (20.0, 44.9), 'U3': (51.03, 23.3), 'J5': (13.4, 16.5)}
+    override = {'J1': (4.6, 11.4), 'J2': (33.4, 11.4), 'U1': (22.5, 32.2), 'J3': (45.3, 5.2), 'J4': (7.4, 46.0), 'C3': (10.8, 39.8), 'C4': (46.0, 48.5), 'C2': (42.5, 37.4), 'R11': (48.6, 32.6), 'JP1': (17.8, 22.9), 'C6': (20.0, 44.9), 'U3': (51.03, 23.3)}
     if ref in override: r.SetPosition(v(*override[ref]))
     if ref == 'D1':   # cathode band on the body is enough; the 'K' text would sit on R10's pad
         for g in list(fp.GraphicalItems()):
@@ -134,9 +133,8 @@ def label(t, x, y, size=1.0, layer=p.F_SilkS, angle=0):
 label('BODY', 4.6, 13.0, .8); label('HEAD', 26.3, 13.9, .8)
 label('1=ILL+ 2=GND', 48.3, 10.9, .8)
 label('GND UPDI TX', 12.54, 48.9, .8)
-label('KENWOOD PROXY REV B', 23.5, 15.4, .8)
-label('JP1: ONLY WITH U1 REMOVED', 24.5, 17.2, .8)
-label('GND B>H H>B HRX', 6.9, 18.65, .8)
+label('KENWOOD PROXY REV A', 15.5, 15.4, .8)
+label('JP1: ONLY WITH U1 REMOVED', 15.5, 17.2, .8)
 # Isolation boundary line on silk
 for a_, z_ in [((ILL_REGION[0], 14.0), (ILL_REGION[0], 24.5)), ((ILL_REGION[0], 24.5), (48.0, 24.5))]:
     s = p.PCB_SHAPE(); s.SetShape(p.SHAPE_T_SEGMENT); s.SetStart(v(*a_)); s.SetEnd(v(*z_)); s.SetLayer(p.F_SilkS); s.SetWidth(mm(.15)); b.Add(s)
@@ -192,17 +190,6 @@ if opt.session:
         if not spur: break
         for t in spur: b.Remove(t); removed += 1
     print('Removed', removed, 'dangling track/via items')
-    # Rev B hand fix: Freerouting (999 passes) left PB's via-to-track link beside J4 unrouted in the 0.6 mm
-    # power class. Joins the PB via and the nearest PB bottom-layer track end at their exact positions
-    # (clears J4 pin 1 by about 0.45 mm). Tied to checks/routing.ses; re-check if the routing is redone.
-    pbn = nets['PB'].GetNetCode()
-    def near(items, x, y):
-        tgt = v(x, y); return min(items, key=lambda q: (q - tgt).EuclideanNorm())
-    pb_via = near([t.GetPosition() for t in b.GetTracks() if t.GetClass() == 'PCB_VIA' and t.GetNetCode() == pbn], 8.3965, 45.3524)
-    pb_end = near([e for t in b.GetTracks() if t.GetClass() == 'PCB_TRACK' and t.GetNetCode() == pbn and t.GetLayer() == p.B_Cu
-                   for e in (t.GetStart(), t.GetEnd())], 8.3965, 46.9458)
-    assert (pb_via - v(8.3965, 45.3524)).EuclideanNorm() < mm(.05) and (pb_end - v(8.3965, 46.9458)).EuclideanNorm() < mm(.05)
-    t = p.PCB_TRACK(b); t.SetStart(pb_via); t.SetEnd(pb_end); t.SetWidth(mm(.6)); t.SetLayer(p.B_Cu); t.SetNet(nets['PB']); t.SetLocked(True); b.Add(t)
     # GND stitching vias on a 3 mm grid wherever they clear all foreign copper; they also tie any
     # trace-enclosed pour fragments to the other layer. Vias not landing in pour on both layers are removed.
     def blocked(x, y):
@@ -270,6 +257,6 @@ proj = BASE/'kenwood_proxy.kicad_pro'
 settings = json.loads(proj.read_text())
 settings.setdefault('board', {}).setdefault('design_settings', {}).setdefault('rules', {}).update(
     {'min_clearance': .2, 'min_through_hole_diameter': .3, 'min_track_width': .2, 'min_copper_edge_clearance': .5, 'min_hole_clearance': .25})
-settings['text_variables'] = {'REVISION': 'B'}
+settings['text_variables'] = {'REVISION': 'A-DRAFT'}
 proj.write_text(json.dumps(settings, indent=2)+'\n')
 print('Placed', len(fps), 'footprints on', W, 'x', H, 'mm')

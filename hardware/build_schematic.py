@@ -89,12 +89,12 @@ R=standard('Device','R'); C=standard('Device','C'); CP=standard('Device','C_Pola
 XTAL=standard('Device','Crystal'); DIODE=standard('Diode','1N4148')
 LDO=standard('Regulator_Linear','LM2936-5.0_TO92')
 OPTO=standard('Isolator','SFH617A-3'); MCU=standard('MCU_Microchip_AVR_Dx','AVR128DB28x-xSP')
-CON2=standard('Connector_Generic','Conn_01x02'); CON3=standard('Connector_Generic','Conn_01x03'); CON4=standard('Connector_Generic','Conn_01x04')
+CON2=standard('Connector_Generic','Conn_01x02'); CON3=standard('Connector_Generic','Conn_01x03')
 TP=standard('Connector','TestPoint')
 HOLE=standard('Mechanical','MountingHole'); FLAG=standard('power','PWR_FLAG')
 JACK=custom('WR-MJ_4P4C_TabUp','J',[
     ('1','PB','passive',-17.78,3.81,0),('2','GND','passive',-17.78,1.27,0),
-    ('3','DATA_body-to-head','passive',-17.78,-1.27,0),('4','DATA_head-to-body','passive',-17.78,-3.81,0)],
+    ('3','TXD_head-to-body','passive',-17.78,-1.27,0),('4','RXD_body-to-head','passive',-17.78,-3.81,0)],
     w=15.24,h=6.35,desc='Wurth 615004143821 4P4C. Manufacturer numbering: looking into mating face, tab up, contacts 4,3,2,1 left to right.',
     footprint=LIBNICK+':Wurth_615004143821_4P4C_TabUp')
 
@@ -114,7 +114,6 @@ FP = {
  'DO35':  'Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal',
  'H2':    'Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical',
  'H3':    'Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical',
- 'H4':    'Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical',
  'MF2':   'Connector_Molex:Molex_Micro-Fit_3.0_43045-0200_2x01_P3.00mm_Horizontal',
  'TP':    'TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm',
  'HOLE':  'MountingHole:MountingHole_3.2mm_M3',
@@ -179,7 +178,7 @@ class Sheet:
         for k in sorted(self.used):
             a=copy.deepcopy(SYMBOLS[k]); a[1]=LIBNICK+':'+k; libs.append(a)
         root=node('kicad_sch',node('version',20250114),node('generator',Atom('eeschema')),node('generator_version','10.0'),node('uuid',self.uuid),node('paper','A3'),
-                  node('title_block',node('title',self.title),node('date','2026-11-15'),node('rev','B'),node('comment',1,'Electrical draft - not released for fabrication')),
+                  node('title_block',node('title',self.title),node('date','2026-10-09'),node('rev','A-DRAFT'),node('comment',1,'Electrical draft - not released for fabrication')),
                   node('lib_symbols',*libs),*self.items,node('embedded_fonts',Atom('no')))
         (HERE/(self.name+'.kicad_sch')).write_text(dump(root)+'\n')
 
@@ -194,14 +193,12 @@ def flag(s,n,x,y,net):
 
 # ================================================================ sheet 1
 s=Sheet('01_radio_link','01  Kenwood radio link','Body and head 4P4C jacks, PB/GND pass-through, full-proxy body-to-head path, MCU receive taps.')
-# Rev B: data directions MEASURED on the radio 2026-11-15 (FT232 sniff in the truck): the body transmits on
-# cable pin 3 and the head on pin 4. Rev A had these reversed. Body->head data lands on J1.3 and leaves on J2.3.
-jn=lambda side:{'1':'PB','2':'GND','3':'BODY_TXD' if side=='BODY' else 'HEAD_RXD','4':'HEAD_TXD'}
+jn=lambda side:{'1':'PB','2':'GND','3':'HEAD_TXD','4':'BODY_TXD' if side=='BODY' else 'HEAD_RXD'}
 s.comp('J1',JACK,63.5,63.5,jn('BODY'),'KENWOOD BODY',LIBNICK+':Wurth_615004143821_4P4C_TabUp','615004143821','Wurth Elektronik',
-       'Cable from radio body (already 4P4C). Pin 3 = body TX (measured), pin 4 = body RX, 2 = GND, 1 = PB',fields=[(63.5,52.07),(63.5,54.61)])
+       'Cable from radio body (already 4P4C). Tab up, mating face: L1..L4 = pins 4,3,2,1 = RXD,TXD,GND,PB',fields=[(63.5,52.07),(63.5,54.61)])
 s.comp('J2',JACK,63.5,101.6,jn('HEAD'),'KENWOOD HEAD',LIBNICK+':Wurth_615004143821_4P4C_TabUp','615004143821','Wurth Elektronik',
        'Straight-through cable to control head. Identical pinout to J1',fields=[(63.5,90.17),(63.5,92.71)])
-s.text(15.24,121.92,'Data directions MEASURED on the radio (2026-11-15, Rev A sniff): pin 3 carries body -> head\n(display data), pin 4 carries head -> body (keys). Rev A had these swapped. PB = pin 1, GND = pin 2 (confirmed).\nCables are straight-through; never cross pins between J1 and J2.')
+s.text(15.24,121.92,'Physical mapping (user-confirmed, both jacks): looking into the mating face with the latch tab UP,\nleft to right L1 RXD (body->head), L2 TXD (head->body), L3 GND, L4 PB.\nWurth numbers that face 4,3,2,1 left to right, so pin 4 = RXD, 3 = TXD, 2 = GND, 1 = PB.\nCables are straight-through; never cross TX/RX between J1 and J2.')
 s.text(139.7,58.42,'PB and GND pass straight through in copper (J1 pin 1/2 = J2 pin 1/2). The board supply taps PB.')
 # body -> head data path: FULL PROXY only. The MCU receives every body byte on TAP_BODY and retransmits it to the head.
 res(s,'R2',203.2,88.9,'470R','HEAD_TX_MCU','HEAD_RXD',note='MCU USART1 TX -> head RX series resistor: limits current into head input clamps and into the body driver if JP1 is fitted with U1 present (<=3.5 mA)')
@@ -209,9 +206,7 @@ s.comp('JP1',CON2,88.9,170.18,{'1':'BODY_TXD','2':'HEAD_RXD'},'HARD BYPASS',FP['
        'Leave OPEN normally. Recovery only: remove U1 AND fit shunt -> direct copper body->head. Shunt is separate accessory SNT-100-BK-G',fields=[(78.74,160.02),(78.74,162.56)])
 res(s,'R6',152.4,160.02,'10k','BODY_TXD','TAP_BODY',note='MCU USART0 RX tap on the body stream; limits clamp current when U1 is unpowered')
 res(s,'R7',152.4,182.88,'10k','HEAD_TXD','TAP_HEAD',note='MCU USART1 RX tap on the head stream (logging); limits clamp current when U1 is unpowered')
-s.comp('J5',CON4,203.2,170.18,{'1':'GND','2':'TAP_BODY','3':'TAP_HEAD','4':'HEAD_RXD'},'DATA TAPS',FP['H4'],'PRPC040SAAN-RC','Sullins',
-       'Bench/test taps for a logic analyzer or USB-serial RX: 1 GND, 2 body->head (via R6 10k), 3 head->body (via R7 10k), 4 what the head receives (after R2 470R). Snapped from the 40-pin strip. Listen only: never connect an adapter TX or power',fields=[(203.2,157.48),(203.2,160.02)])
-s.text(139.7,213.36,'HEAD_TXD -> BODY RX is direct copper (J2 pin 4 = J1 pin 4); the MCU only listens.\nBODY_TXD -> HEAD RX goes only through the MCU (full proxy): body bytes are received on TAP_BODY,\nbrightness packets rewritten, everything else forwarded byte-for-byte via R2. Head input has its own 47k pull-up,\nso it idles high while the MCU is in reset or being programmed. Recovery if U1 fails: pull U1 and fit JP1.')
+s.text(139.7,213.36,'HEAD_TXD -> BODY RX is direct copper (J2 pin 3 = J1 pin 3); the MCU only listens.\nBODY_TXD -> HEAD RX goes only through the MCU (full proxy): body bytes are received on TAP_BODY,\nbrightness packets rewritten, everything else forwarded byte-for-byte via R2. Head input has its own 47k pull-up,\nso it idles high while the MCU is in reset or being programmed. Recovery if U1 fails: pull U1 and fit JP1.')
 
 # ================================================================ sheet 2
 s=Sheet('02_power_mcu','02  PB supply and AVR128DB28','PB (body side) -> R1 -> filter -> LM2936 5 V -> AVR128DB28 (socketed). 32.768 kHz crystal for OSCHF auto-tune.')
@@ -228,7 +223,7 @@ mcu={'1':None,'2':'HEAD_TX_MCU','3':'TAP_HEAD','4':None,'5':None,'6':'+5V','7':'
 s.comp('U1',MCU,101.6,170.18,mcu,'AVR128DB28-I/SP',FP['DIP28S'],'AVR128DB28-I/SP','Microchip','Socketed SPDIP-28. 5 V, internal OSCHF auto-tuned to XOSC32K',fields=[(119.38,134.62),(119.38,137.16)])
 for r,(x,net) in zip(['C1','C2','C3'],[(203.2,'VDD pin 20'),(228.6,'AVDD pin 14'),(254.0,'VDDIO2 pin 6')]):
     cap(s,r,x,152.4,'100nF 50V X7R','+5V',mpn='C320C104K5R5TA',mfg='KEMET',note='Decoupling at U1 '+net)
-s.comp('Y1',XTAL,215.9,190.5,{'1':'XTAL32K1','2':'XTAL32K2'},'32.768kHz 12.5pF',FP['XTAL'],'AB26T-32.768KHZ','Abracon','Through-hole long-lead variant (Rev A used AB26TRB, whose short formed leads barely reach). CL 12.5 pF, ESR 50k max (AVR XOSC32K limit 100k). Short traces, ground guard')
+s.comp('Y1',XTAL,215.9,190.5,{'1':'XTAL32K1','2':'XTAL32K2'},'32.768kHz 12.5pF',FP['XTAL'],'AB26TRB-32.768KHZ-T','Abracon','CL 12.5 pF, ESR 50k max (AVR XOSC32K limit 100k). Short traces, ground guard')
 cap(s,'C7',203.2,215.9,'15pF C0G','XTAL32K1',mpn='C315C150J1G5TA',mfg='KEMET',note='Crystal load, C0G')
 cap(s,'C8',228.6,215.9,'15pF C0G','XTAL32K2',mpn='C315C150J1G5TA',mfg='KEMET',note='Crystal load, C0G')
 s.text(15.24,241.3,'Pin plan (AVR128DB28 SPDIP): USART0 PA1 RX <- TAP_BODY, PA0 TX -> DBG_TX (both at radio baud).\nUSART1 PC1 RX <- TAP_HEAD, PC0 TX -> HEAD_TX_MCU (proxy output to head). PD1 ILL_SENSE (low = lights on).\nAll other I/O unconnected (PA2-PA7, PC2-PC3, PD2-PD7); enable their internal pull-ups or disable input buffers. PF0/PF1 crystal.\nOSCHF accuracy is only +/-5% below 0 C without the crystal: enable XOSC32K auto-tune before using UARTs.\nSuggested clock 10 or 20 MHz (harmonics clear of 144-148 MHz). VDDIO2 tied to +5 V. RESET left on internal pull-up.')
@@ -261,7 +256,7 @@ lib=node('kicad_symbol_lib',node('version',20250114),node('generator',Atom('kica
 (HERE/'sym-lib-table').write_text(f'(sym_lib_table (version 7) (lib (name "{LIBNICK}")(type "KiCad")(uri "${{KIPRJMOD}}/{LIBNICK}.kicad_sym")(options "")(descr "Project-local symbols")))\n')
 (HERE/'fp-lib-table').write_text(f'(fp_lib_table (version 7) (lib (name "{LIBNICK}")(type "KiCad")(uri "${{KIPRJMOD}}/footprints/{LIBNICK}.pretty")(options "")(descr "Project-local footprints")))\n')
 root=node('kicad_sch',node('version',20250114),node('generator',Atom('eeschema')),node('generator_version','10.0'),node('uuid',ROOT_ID),node('paper','A3'),node('lib_symbols'),
-          node('title_block',node('title','Kenwood TM-V71A proxy'),node('date','2026-11-15'),node('rev','B')))
+          node('title_block',node('title','Kenwood TM-V71A proxy'),node('date','2026-10-09'),node('rev','A-DRAFT')))
 root.append(node('text','KENWOOD TM-V71A PROXY - ELECTRICAL DRAFT\nFull-proxy day/night brightness proxy, PB powered, hand-assembled THT.\nOpen the three circuit sheets below.',node('at',25.4,20.32,0),fx(2.0,'left top'),node('uuid',uid('rootnote'))))
 for i,sh in enumerate(SHEETS):
     x=25.4+i*127; y=68.58
@@ -273,6 +268,6 @@ for i,sh in enumerate(SHEETS):
 root.append(node('sheet_instances',node('path','/',node('page','1')))); root.append(node('embedded_fonts',Atom('no')))
 (HERE/(PROJECT+'.kicad_sch')).write_text(dump(root)+'\n')
 if not (HERE/(PROJECT+'.kicad_pro')).exists():
-    (HERE/(PROJECT+'.kicad_pro')).write_text(json.dumps({'meta':{'filename':PROJECT+'.kicad_pro','version':1},'schematic':{'meta':{'version':1}},'text_variables':{'REVISION':'B'}},indent=2)+'\n')
+    (HERE/(PROJECT+'.kicad_pro')).write_text(json.dumps({'meta':{'filename':PROJECT+'.kicad_pro','version':1},'schematic':{'meta':{'version':1}},'text_variables':{'REVISION':'A-DRAFT'}},indent=2)+'\n')
 (HERE/'design_intent.json').write_text(json.dumps(COMPONENTS,indent=2)+'\n')
 print(f'Created {len(SHEETS)+1} native sheets, {len(COMPONENTS)} references (including power flags).')

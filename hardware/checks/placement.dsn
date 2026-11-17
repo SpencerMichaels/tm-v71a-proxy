@@ -114,9 +114,6 @@
     (component Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical
       (place JP1 16500 -25000 front 90 (PN "HARD BYPASS"))
     )
-    (component Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
-      (place J5 3000 -16500 front 90 (PN "DATA TAPS"))
-    )
     (component Kenwood_Proxy:Wurth_615004143821_4P4C_TabUp
       (place J2 24800 -8300 front 180 (PN "KENWOOD HEAD"))
       (place J1 11800 -8300 front 180 (PN "KENWOOD BODY"))
@@ -721,24 +718,6 @@
       (pin Rect[A]Pad_1700.000000x1700.000000_um 1 0 0)
       (pin Round[A]Pad_1700.000000_um 2 0 -2540)
     )
-    (image Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical
-      (outline (polygon signal 0  -1765 -9385  -1765 1765  1765 1765  1765 -9385))
-      (outline (path signal 120  -1380 1380  0 1380))
-      (outline (path signal 120  -1380 0  -1380 1380))
-      (outline (path signal 120  -1380 -1270  -1380 -9000))
-      (outline (path signal 120  -1380 -1270  1380 -1270))
-      (outline (path signal 120  -1380 -9000  1380 -9000))
-      (outline (path signal 120  1380 -1270  1380 -9000))
-      (outline (path signal 100  -1270 635  -635 1270))
-      (outline (path signal 100  -1270 -8890  -1270 635))
-      (outline (path signal 100  -635 1270  1270 1270))
-      (outline (path signal 100  1270 1270  1270 -8890))
-      (outline (path signal 100  1270 -8890  -1270 -8890))
-      (pin Rect[A]Pad_1700.000000x1700.000000_um 1 0 0)
-      (pin Round[A]Pad_1700.000000_um 2 0 -2540)
-      (pin Round[A]Pad_1700.000000_um 3 0 -5080)
-      (pin Round[A]Pad_1700.000000_um 4 0 -7620)
-    )
     (image Kenwood_Proxy:Wurth_615004143821_4P4C_TabUp
       (outline (polygon signal 0  -7745 5195  4685 5195  4685 -8795  -7745 -8795))
       (outline (path signal 100  -6530 4700  3470 4700  3470 -8300  -6530 -8300  -6530 4700))
@@ -838,7 +817,7 @@
       (pins R11-1 U2-1 U1-6 U1-14 U1-20 C4-1 C3-1 C2-1 C1-1)
     )
     (net BODY_TXD
-      (pins R6-1 JP1-1 J1-3)
+      (pins R6-1 JP1-1 J1-4)
     )
     (net DBG_TX
       (pins R13-2 J4-3)
@@ -848,13 +827,13 @@
     )
     (net GND
       (pins U3-3 J4-1 U2-2 U1-15 U1-21 TP2-1 C8-2 C7-2 C6-2 C5-2 C4-2 C3-2 C2-2 C1-2
-        J5-1 J2-2 J1-2)
+        J2-2 J1-2)
     )
     (net HEAD_RXD
-      (pins R2-2 JP1-2 J5-4 J2-3)
+      (pins R2-2 JP1-2 J2-4)
     )
     (net HEAD_TXD
-      (pins R7-1 J2-4 J1-4)
+      (pins R7-1 J2-3 J1-3)
     )
     (net HEAD_TX_MCU
       (pins U1-2 R2-1)
@@ -878,10 +857,10 @@
       (pins U2-3 R1-2 C6-1 C5-1)
     )
     (net TAP_BODY
-      (pins U1-23 R6-2 J5-2)
+      (pins U1-23 R6-2)
     )
     (net TAP_HEAD
-      (pins U1-3 R7-2 J5-3)
+      (pins U1-3 R7-2)
     )
     (net UPDI
       (pins J4-2 U1-19)

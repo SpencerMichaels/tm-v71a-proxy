@@ -11,22 +11,22 @@
       "detail": ""
     },
     {
-      "check": "J1 pin1 PB / pin2 GND / pin4 HEAD_TXD (head -> body, measured)",
+      "check": "J1 pin1 PB / pin2 GND / pin3 HEAD_TXD",
       "pass": true,
       "detail": ""
     },
     {
-      "check": "J2 pin1 PB / pin2 GND / pin4 HEAD_TXD (head -> body, measured)",
+      "check": "J2 pin1 PB / pin2 GND / pin3 HEAD_TXD",
       "pass": true,
       "detail": ""
     },
     {
-      "check": "J1 pin3 = BODY_TXD, J2 pin3 = HEAD_RXD (body -> head on pin 3, measured)",
+      "check": "J1 pin4 = BODY_TXD, J2 pin4 = HEAD_RXD (no TX/RX crossover)",
       "pass": true,
       "detail": ""
     },
     {
-      "check": "HEAD_TXD direct copper J2.4 to J1.4",
+      "check": "HEAD_TXD direct copper J2.3 to J1.3",
       "pass": true,
       "detail": ""
     },
@@ -41,14 +41,14 @@
       "detail": ""
     },
     {
-      "check": "HEAD_RXD connections limited to J2, JP1, R2, J5 (test tap)",
+      "check": "HEAD_RXD connections limited to J2, JP1, R2",
       "pass": true,
-      "detail": "[('J2', '3'), ('J5', '4'), ('JP1', '2'), ('R2', '2')]"
+      "detail": "[('J2', '4'), ('JP1', '2'), ('R2', '2')]"
     },
     {
       "check": "BODY_TXD connections limited to J1, JP1, R6 (tap)",
       "pass": true,
-      "detail": "[('J1', '3'), ('JP1', '1'), ('R6', '1')]"
+      "detail": "[('J1', '4'), ('JP1', '1'), ('R6', '1')]"
     },
     {
       "check": "Proxy output: U1 pin 2 (PC0, USART1 TX) -> R2 -> HEAD_RXD",
@@ -62,16 +62,6 @@
     },
     {
       "check": "No U1 pin directly on any radio-line net",
-      "pass": true,
-      "detail": ""
-    },
-    {
-      "check": "J5 taps: GND, TAP_BODY, TAP_HEAD, HEAD_RXD",
-      "pass": true,
-      "detail": ""
-    },
-    {
-      "check": "TAP_BODY/TAP_HEAD only reach the radio through R6/R7 10k",
       "pass": true,
       "detail": ""
     },

@@ -1,4 +1,4 @@
-"""Kenwood proxy Rev B enclosure: base tray + cover, generated with FreeCAD.
+"""Kenwood proxy Rev A enclosure: base tray + cover, generated with FreeCAD.
 
 Run:  /Applications/FreeCAD.app/Contents/Resources/bin/freecadcmd build_enclosure.py
 Writes kp_case_base.stl, kp_case_cover.stl, kp_case.step and preview PNGs next to this file,
@@ -48,7 +48,7 @@ PARTS = [
     ('J3', 35.42, 43.58, 0.0, 13.7, MICROFIT_H + 1.0),
     ('U1+socket', 4.6, 40.4, 27.0, 37.4, 9.5), ('C4', 38.7, 44.8, 45.5, 51.5, 12.0),
     ('C6', 17.0, 23.0, 46.0, 51.0, 8.0), ('U2', 30.6, 37.3, 46.0, 51.0, 6.0),
-    ('R1', 30.8, 47.4, 40.2, 44.8, 5.0), ('J4', 8.7, 16.4, 44.7, 47.3, 8.6), ('J5', 1.7, 11.9, 15.2, 17.8, 8.6),
+    ('R1', 30.8, 47.4, 40.2, 44.8, 5.0), ('J4', 8.7, 16.4, 44.7, 47.3, 8.6),
     ('JP1', 15.2, 20.4, 21.6, 26.4, 8.6), ('U3', 48.2, 53.9, 18.4, 28.2, 5.0),
 ]
 

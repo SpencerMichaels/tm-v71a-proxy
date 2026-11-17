@@ -1,101 +1,102 @@
-# Hardware: Rev B
+# Kenwood TM-V71A proxy — native KiCad Rev A
 
-The KiCad 10 project for the proxy board: a 54 × 52 mm, 2-layer, all-through-hole board for hand assembly.
+> **Rev A as built, kept for reference.** Rev A's two data lines are swapped relative to the radio (body transmits on cable pin 3, head on pin 4; see [docs/protocol.md](../docs/protocol.md)). A built board needs the rework in [REWORK.html](REWORK.html), and the firmware's default `REV=A-rework` build. The notes below describe the original design intent, including the swapped pin mapping. For a new board use Rev B on the `main` branch.
 
-| File | What |
-|---|---|
-| `kenwood_proxy.kicad_pro` / `.kicad_sch` / `.kicad_pcb` | The KiCad project, with three schematic sheets |
-| `fab/` | Gerbers (OSH Park zip), BOMs, [ordering notes](fab/ORDERING.md) |
-| `enclosure/` | 3D-printable case: STL, STEP and the generator; see its [README](enclosure/README.md) |
-| `checks/` | Schematic PDF, layout PDF (1:1), ERC/DRC reports, design-check results, netlist |
-| `build_schematic.py`, `build_board.py`, `check_design.py` | Scripts that generate and check the design (see [Rebuilding](#rebuilding)) |
-| `simulation/`, [`simulation_review.md`](simulation_review.md) | ngspice checks of the interface, ILL input and power networks |
-| `footprints/`, `Kenwood_Proxy.kicad_sym` | Project footprint (4P4C jack) and symbol library |
+Open `kenwood_proxy.kicad_pro` in KiCad 10. The schematic and routed 2-layer PCB are ready for an OSH Park prototype order (see [fab/ORDERING.md](fab/ORDERING.md)). Design decisions and rationale are in [KENWOOD_PCB_DESIGN_HANDOFF.md](../../KENWOOD_PCB_DESIGN_HANDOFF.md).
 
-**Rev B status.** Rev B is Rev A with three changes:
-- the data-line fix
-- the J5 tap header
-- a long-lead crystal
+## What the board does
 
-The design has been verified on a **reworked Rev A board** in a vehicle, and the firmware is the same. Rev B itself hasn't been fabricated yet. It passes ERC, DRC with schematic parity, and the design checks.
+- **Pass-through.** Two Würth 615004143821 4P4C jacks (J1 body, J2 head). PB and GND pass straight through in copper. HEAD_TXD goes to BODY RX as direct copper; the MCU only listens to it (TAP_HEAD through R7 10 kΩ, for logging).
+- **Full proxy, body→head.** The body's TXD goes only to the MCU (TAP_BODY through R6 10 kΩ). The MCU retransmits every byte to the head on USART1 TX through R2 (470 Ω), rewriting brightness packets on the way. Nothing else connects body TXD to head RXD except the JP1 recovery jumper.
+- **Idle and reset behavior.** The head's RX input has its own 47 kΩ pull-up. While the MCU is in reset, being programmed, or removed, the head line idles high and the display keeps its last content. It gets no new data until the MCU runs.
+- **JP1 hard bypass.** Leave it open. Recovery only: **remove U1 and fit the shunt**, which connects body TXD straight to head RXD. Fitting JP1 while U1 runs makes the MCU and body fight: no damage (simulated peaks are 10 mA at the AVR pin and 5 mA at the body driver), but garbled data.
+- **Recovery.** Pull U1 from its socket and fit the JP1 shunt. If the board itself is suspect, replace it with a **straight-through** 4P4C coupler. Many RJ9/RJ11 couplers are reversed (1→4), which would put PB on the head's RX pin, so check continuity first. A spare OSH Park board fitted with only J1, J2 and a JP1 shunt (or wire) is a known-good coupler.
+- **PB supply.** The radio's PB line (about 10 V from the radio's own regulator) feeds R1 150 Ω 1 W, an RC filter (C6, C5) and the LM2936Z-5.0 regulator, giving 5 V for a socketed AVR128DB28. The board never takes power from truck wiring. R1 limits current into a board fault and isolates MCU noise from PB; the voltage across R1 divided by 150 gives board current.
+- **ILL sensing (lights on/off only).** Wire J3 (Molex Micro-Fit 3.0, latching; pin 1 ILL+, pin 2 GND) to **ILL+ (TAIL) and a chassis ground**, for example the ground wire in the stereo harness.
+  - With the lights on, ILL+ sits at a steady 11–14 V, the SFH617A-3 LED conducts and ILL_SENSE reads low. With the lights off, ILL+ is below 1 V and ILL_SENSE reads high.
+  - The optocoupler keeps the truck wiring isolated from the radio ground (nets ILL_P, ILL_GND, ILL_LED_A).
+  - Simulated: reads low at 0.36 V or less down to 9 V, reads high at 5.0 V with ILL+ up to 2 V, and is safe with reversed wiring (D1), 24 V and a 40 V load dump (R9 0.5 W).
+- **Programming header.** J4 is a 1×3 0.1 in header: 1 GND, 2 UPDI, 3 DBG_TX (through R13). It is for bench programming and packet logging before the board goes behind the dash. Use an Adafruit UPDI Friend or similar 5 V SerialUPDI adapter on GND + UPDI, and a separate 5 V USB-serial adapter's RX on DBG_TX for logging. The board is powered by the radio cable while programming; never connect adapter power.
 
-## Circuit
-
-| Block | What it does |
-|---|---|
-| **Pass-through** | J1 (BODY) and J2 (HEAD) are Würth 615004143821 4P4C jacks. PB (pin 1), GND (pin 2) and the head → body data line (pin 4) run straight through in copper. |
-| **Proxy, body → head** | The body's data (J1 pin 3) goes only to the AVR, through R6 10 kΩ. The AVR re-sends every byte to the head (J2 pin 3) on USART1 TX through R2 470 Ω, rewriting brightness messages on the way. |
-| **Idle and reset** | The head's input has its own 47 kΩ pull-up. While the AVR is in reset, being programmed or removed, the line idles high and the display keeps its last content. |
-| **JP1 bypass** | Recovery only: **remove U1, then fit the shunt** to connect body data straight to the head. With U1 running, JP1 makes the AVR and the body fight over the line. Nothing is damaged (simulated peaks are 10 mA at the AVR pin and 5 mA at the body's driver), but the data is garbled. |
-| **Power** | PB (about 10 V from the radio's regulator) → R1 150 Ω 1 W → RC filter (C6, C5) → LM2936Z-5.0 → 5 V. Draws about 5 mA. The board never takes power from vehicle wiring. R1 limits fault current, and the voltage across it ÷ 150 gives the board's current. |
-| **Lights input** | J3 (Molex Micro-Fit 3.0, latching): pin 1 ILL+, pin 2 GND. R9 2.2 kΩ, R10 680 Ω shunt, D1 reverse protection, then an SFH617A-3 optocoupler. ILL_SENSE (PD1) reads low when the lights are on. The vehicle side is isolated from the radio's ground. |
-| **J4: programming** | 1 GND, 2 UPDI, 3 DBG_TX (event log, through R13). |
-| **J5: data taps** | 1 GND, 2 body → head (through R6), 3 head → body (through R7), 4 what the head receives (after R2). Listen only. |
-| **Crystal** | Y1, 32.768 kHz, auto-tunes the AVR's internal 20 MHz oscillator, so the UART timing holds over temperature. |
-
-**Lights input, simulated:**
-- reads low (0.36 V or less) with ILL+ from 9 V upward
-- reads high (5.0 V) with ILL+ at 2 V or below
-- survives reversed wiring (D1), 24 V, and a 40 V load dump (R9 is rated 0.5 W)
-
-## MCU pins (AVR128DB28, SPDIP-28)
+## MCU pin plan (AVR128DB28 SPDIP-28, DS40002247B table 3-1)
 
 | Pin | Port | Function |
 |---|---|---|
-| 23 | PA1 | USART0 RX ← body data, through R6 |
-| 22 | PA0 | USART0 TX → DBG_TX on J4 pin 3 (event log, 57,600 baud) |
-| 2 | PC0 | USART1 TX → R2 → head's data input |
-| 3 | PC1 | head → body data, through R7 (logging only) |
-| 7 | PD1 | ILL_SENSE (low = lights on) |
-| 16 / 17 | PF0 / PF1 | 32.768 kHz crystal |
+| 23 / 22 | PA1 / PA0 | USART0 RX ← TAP_BODY; TX → DBG_TX (radio baud) |
+| 3 / 2 | PC1 / PC0 | USART1 RX ← TAP_HEAD (logging); TX → HEAD_TX_MCU → R2 → head RX (proxy output; normal polarity, idle high) |
+| 16 / 17 | PF0 / PF1 | 32.768 kHz crystal, OSCHF auto-tune |
+| 7 | PD1 | ILL_SENSE (digital input: low = lights on) |
 | 19 | UPDI | J4 pin 2 |
-| 6, 14, 20 / 15, 21 | | 5 V / GND |
-| others | PA2–PA7, PC2–PC3, PD2–PD7 | unused; the firmware enables pull-ups |
+| others | PA2–PA7, PC2–PC3, PD2–PD7 | Unconnected: enable internal pull-ups or disable their input buffers |
 
-## Interface levels
+Enable crystal auto-tune before relying on the UARTs. Without it, the internal oscillator is only ±5% below 0 °C and ±3% at 60–85 °C (datasheet figure 39-2), which is marginal for 8N1 with the AVR both receiving and transmitting. Suggested core clock is 10 or 20 MHz, whose harmonics stay clear of 144–148 MHz.
 
-Taken from the TM-V71A service manual; see [`docs/research/`](../docs/research/).
-- **Body transmit:** a TC74HC4050 buffer through a 1 kΩ resistor.
-- **Body receive:** through a 1 kΩ resistor with a 47 kΩ pull-up.
-- **Head receive:** a TC4S81F gate with a 47 kΩ pull-up and a varistor.
+**Firmware pin configuration.** Default Schmitt input levels work on all pins (simulated margin on the taps is at least 0.82 V). Set the SUT fuse short (0–1 ms) so the proxy starts forwarding quickly after power-up.
 
-Simulated against those values:
-- the proxy's low level at the head is 0.06 V
-- the low level through the JP1 bypass is 0.11 V
-- JP1 fitted with U1 running gives a steady 3.5 mA of contention, which is safe
+## Firmware behavior: proxy and day/night brightness memory
 
-Cable corners from 100 pF to 470 pF were simulated: the default installation (a 4 m body cable, a 0.3 m head cable) plus those extremes.
+Public reverse engineering ([KK4HEJ](https://kk4hej.wordpress.com/decoding-the-tm-v71a-display-protocol/)) describes 57,600 8N1, `0x0D`-terminated messages and `0x33 '0'..'8' 0x0D` for brightness. Radio→panel messages set state, and no ACK or retry is documented. Firmware v1 is a **logger** that forwards bytes unchanged and copies both streams to DBG_TX, to confirm packet format, power-on behavior and timing before any rewriting is enabled.
+
+- **Forwarding.** Each byte received on TAP_BODY is sent to the head right away. Added latency is about one byte time (0.17 ms).
+- **Rewriting brightness.** When a byte after `0x0D` is `0x33`, the next byte (the level digit) is replaced by the stored slot for the current lights state. No buffering is needed. The firmware still records the body's original digit.
+- **Inserting a packet.** On a lights change or at power-on, the firmware sends its own brightness packet right after the next `0x0D` it forwards. Body bytes that arrive meanwhile go into a small ring buffer (64 bytes is ample; an insert is 3 bytes) and are forwarded right after. The backlog drains at the next idle gap. Collisions are impossible by construction.
+- **Learning.** A body brightness packet whose level differs from the last level the body sent is a user menu change. It is saved to the slot for the current lights state. The head already shows it, so nothing is inserted.
+- **Re-broadcasts are not learning.** If the body re-sends its unchanged level, for example at power-on, the slot is left alone and the stored value is substituted in flight. Without this rule, a power-on re-broadcast at night would overwrite the night slot with the body's value. The body's last level is kept in EEPROM too, so the rule holds across power cycles.
+- **Lights input.** Filter ILL_SENSE for about 50 ms, which covers relay bounce and still looks instant. A cranking sag can at worst cause one brief day/night blink.
+- **First use.** Empty slots (0xFF) mean no rewriting, so the radio behaves normally until each slot has been set once.
+- **EEPROM.** The AVR128DB28 has 512 bytes rated for 100k writes. Write only after the level has been stable for about 2 s, so stepping through the menu costs one write. Twenty changes a day lasts more than ten years.
+- **Menu quirk.** The body's menu starts from its own last value, not the substituted one. The head shows each step live, and the last value is saved, so the result is what was seen.
+- **Watchdog.** Enable the WDT; it costs nothing. A reset only pauses forwarding for milliseconds.
+- **Standby current (to check).** If PB stays live while the radio is off (the head must power its own on key), the board draws about 4.5 mA continuously. Firmware can sleep while the body is silent and wake on USART start-of-frame detection.
 
 ## PCB layout
 
-- **Edges:** J1, J2 and J3 sit on the top edge, with the jack faces flush. J4 is at the bottom left, J5 at the top left, and the power section runs along the bottom. There's an M3 mounting hole in each corner.
-- **Routing:** Freerouting 2.1.0, plus hand-routed ILL nets.
-  - Track widths: PB, PB_FILT and +5 V are 0.6 mm; signals 0.3 mm; ILL nets 0.4 mm.
-  - GND pours on both layers, with stitching vias on a 3 mm grid.
-- **ILL isolation:** the ILL area (top right, outlined on the silkscreen) has no pour and no other tracks. `kenwood_proxy.kicad_dru` enforces at least 2.0 mm from the ILL nets to all other copper, and the layout gives about 2.5 mm.
-- **Checks:** DRC with schematic parity gives 0 violations, 0 unconnected and 0 parity errors (`checks/pcb-drc.json`). The design checks pass 25/25 (`checks/design_checks.json`).
-- **Jack footprint:** matches Würth's official KiCad footprint `J_Wurth_WR-MJ_615004143821` ([WurthElektronik/KiCad-Library](https://github.com/WurthElektronik/KiCad-Library)), rotated 180° and with 1.5 mm pads.
+- **Board.** 54 × 52 mm, 2 layers, all through-hole, for hand assembly on OSH Park bare boards. 26 soldered parts plus the DIP socket. TP2 is a bare plated GND pad for scope ground; every other probe point is a component lead.
+  - J1 BODY, J2 HEAD and J3 (ILL+/GND) are all on the top edge, so every connection used in normal operation is on one edge. The jack mating faces are flush with the edge.
+  - J4 (programming header) is at the bottom left; the power section (R1, C6, C5, U2, C4) runs along the bottom.
+  - Four M3 holes, one in each corner.
+- **Routing.** Autorouted with Freerouting 2.1.0, plus hand-routed ILL nets.
+  - PB, PB_FILT and +5V are 0.6 mm; signals are 0.3 mm; ILL nets are 0.4 mm.
+  - GND pours on both layers, with about 95 GND stitching vias on a 3 mm grid. These also tie trace-enclosed pour fragments to the other layer.
+  - The ILL region (top right, outlined on silk) has no pour and no foreign tracks. `kenwood_proxy.kicad_dru` enforces at least 2.0 mm between ILL nets and all other copper (functional isolation for 12–14 V); the layout gives about 2.5 mm.
+- **Checks.** KiCad DRC with schematic parity: 0 violations, 0 unconnected, 0 parity errors (`checks/pcb-drc.json`).
+- **Outputs.** `checks/pcb_layout.pdf` (top, bottom mirrored, assembly; 1:1, centred on A4 landscape). `checks/pcb-F.svg` and `checks/pcb-B.svg` are layer views. `checks/board_top_1to1.pdf` is a 1:1 silk and fab plot with pad outlines; print it at 100 % for a part-spacing check.
+- **Rebuilding.** `build_board.py` (run with KiCad's Python) rebuilds the board from the netlist. Without `--session` it writes `checks/placement.dsn`. Route that with `java -jar tmp/freerouting-2.1.0.jar -de placement.dsn -do routing.ses -mp 40 --gui.enabled=false`, then run `build_board.py --session checks/routing.ses`. Regeneration overwrites manual PCB edits.
+- **Jack footprint.** Pad, peg and body geometry match Würth's official KiCad footprint `J_Wurth_WR-MJ_615004143821` from [WurthElektronik/KiCad-Library](https://github.com/WurthElektronik/KiCad-Library), rotated 180° and with 1.5 mm pads instead of 1.4 mm. A copy is in `sources/`.
+- **Fabrication outputs.** `fab/kenwood_proxy_revA_oshpark_gerbers.zip` (Gerbers + Excellon drill for OSH Park), `fab/BOM_purchasing.csv`, `fab/BOM_upload_digikey_mouser.csv`; see [fab/ORDERING.md](fab/ORDERING.md).
 
-## Rebuilding
+## Installation assumptions
 
-The schematic and board are generated by scripts. Edit the scripts rather than the KiCad files: **re-running a script overwrites GUI edits.**
+- **Body cable:** body → board 4P4C cable, 4 m (about 200–260 pF per data wire).
+- **Head cable:** board → faceplate bridge cable, about 0.3 m (about 15–20 pF).
+- **Simulation:** this installation is the "as installed" corner (260 pF / 20 pF), bracketed by 100/100 pF and 470/470 pF corners.
+- **Radio supply:** permanently fed from constant battery, so PB is present whenever the radio has DC.
 
-```sh
-python3 build_schematic.py                       # schematic, symbol library, design_intent.json
-python3 check_design.py                          # netlist + ERC + 25 design checks -> checks/
-KPY=/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3
-$KPY build_board.py                              # placement -> checks/placement.dsn
-java -jar freerouting-2.1.0.jar -de checks/placement.dsn -do checks/routing.ses -mp 40 --gui.enabled=false
-$KPY build_board.py --session checks/routing.ses # import routing, pours, hand fixes
-kicad-cli pcb drc --schematic-parity -o checks/pcb-drc.json kenwood_proxy.kicad_pcb
-```
+## Files
 
-`build_board.py` hand-routes one PB link beside J4 that Freerouting leaves unrouted. The paths in it assume the macOS KiCad install; adjust them for other platforms.
+- `build_schematic.py` generates the native schematic, local symbol library and `design_intent.json`. **Re-running overwrites GUI edits.**
+- `check_design.py` exports the KiCad netlist and ERC, then checks pin-level netlist parity, jack mapping, PB containment, proxy-path topology, ILL isolation, the MCU pin plan and hand calculations. Results go to `checks/design_checks.json`. Current status: ERC clean, 23/23 checks pass.
+- `simulation/` and [simulation_review.md](simulation_review.md): ngspice behavioural verification (0 failures, PASS_WITH_MODEL_LIMITATIONS).
+- `checks/schematic.pdf` and `checks/bom_kicad.csv` are KiCad exports.
+- `footprints/Kenwood_Proxy.pretty/` holds the hand-written jack footprint.
+- `sources/` holds the datasheets used: Würth jack, AVR DB, LM2936, SFH617A and AB26TRB.
 
-## Possible future work
+## Loose items not shown as symbols
 
-- **Follow the dash dimmer.** Wire J3 across ILL+ and ILL− instead of ILL+ and GND. The opto output then follows the dimmer's PWM, so the AVR could time the duty cycle and map it to brightness 0–8.
-  - Reported automotive dimmer frequencies are 100 Hz–1 kHz, which the SFH617A and the 10 kΩ pull-up can follow, so this would be firmware-only.
-  - The current firmware's 50 ms "stable" filter assumes a steady input, so it would need changing.
-  - Measure the dimmer's frequency first.
-- **Auto power-on** needs no hardware: the radio resumes its on/off state when DC returns, so an ACC-switched supply is enough.
+| Item | Qty |
+|---|---:|
+| Machined DIP-28 0.3 in socket, Mill-Max 110-43-328-41-001000 | 1 |
+| 2.54 mm shunt for JP1, kept loose for recovery, e.g. Samtec SNT-100-BK-G | 1 |
+| Micro-Fit 3.0 2-circuit receptacle with pre-crimped 22 AWG leads for J3 (Molex 43025-0200, or a pre-crimped kit) | 1 |
+| Adafruit UPDI Friend (or similar 5 V SerialUPDI adapter) | 1 |
+| 5 V USB-serial adapter for logging (RX only) | 1 |
+
+## Open items
+
+1. **Interface levels (service manual).**
+   - Page 84: body TXD leaves TC74HC4050 IC951 through **R956 1 kΩ** to J952-4. Body RXD enters through **R953 1 kΩ** with a 47 kΩ pull-up.
+   - Page 74: the head RX input is a TC4S81F gate with a 47 kΩ pull-up (CP913) and varistor D988.
+   - Resulting levels: proxy low at head 0.06 V; JP1 bypass low 0.11 V; JP1 fitted with U1 running, 3.5 mA steady contention.
+   - Limits used: TC4S81F VIL is the 4000-series 1.5 V maximum at 5 V, taken from DigiKey's listing because the Toshiba datasheet was unavailable. The HC4050 recommended output current is ±4 mA (absolute maximum ±25 mA), from typical 74HC data.
+2. **Unmeasured quantities.** PB current (about 4.5 mA simulated, AVR at 4.4 mA, 20 MHz); radio baud rate and packet format (the logger firmware confirms these).
+3. **Enclosure.** Mounting holes suit a nonconductive enclosure with cable strain relief.

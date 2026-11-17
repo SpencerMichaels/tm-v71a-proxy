@@ -1,0 +1,1049 @@
+<title>Kenwood Proxy Rework</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>
+  // Dark is the default. A saved light choice wins; storage may be unavailable.
+  (function () {
+    var t = 'dark';
+    try { var s = localStorage.getItem('kp-guide-theme'); if (s === 'light' || s === 'dark') t = s; } catch (e) {}
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=Barlow+Semi+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one 46rem reading column, a sticky progress bar, numbered phases in build order.
+   Palette: OSH Park soldermask purple-black with ENIG gold as the accent. Dark first. */
+:root {
+  --bg: #15121c;
+  --surface: #1e1a28;
+  --surface-2: #272233;
+  --line: #3a3348;
+  --fg: #ece8f2;
+  --fg-dim: #aaa2b8;
+  --gold: #d8b45c;
+  --gold-ink: #1b1608;
+  --purple: #a98bdc;
+  --board: #2b1f45;
+  --board-edge: #6a55a0;
+  --warn: #f0a63c;
+  --warn-bg: #2e2312;
+  --stop: #f2665f;
+  --stop-bg: #331a1b;
+  --ok: #7cc68a;
+  --ok-bg: #182a1d;
+  --f-display: "Barlow Semi Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f6f4f9; --surface: #ffffff; --surface-2: #efebf5; --line: #d6cfe2;
+    --fg: #1e1828; --fg-dim: #5b5268; --gold: #8a6a12; --gold-ink: #ffffff; --purple: #5a3d99;
+    --board: #e6def5; --board-edge: #6a55a0; --warn: #9a5c00; --warn-bg: #fdf1dc;
+    --stop: #b3261e; --stop-bg: #fbe4e2; --ok: #2b7a3a; --ok-bg: #e2f3e5; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f6f4f9; --surface: #ffffff; --surface-2: #efebf5; --line: #d6cfe2;
+  --fg: #1e1828; --fg-dim: #5b5268; --gold: #8a6a12; --gold-ink: #ffffff; --purple: #5a3d99;
+  --board: #e6def5; --board-edge: #6a55a0; --warn: #9a5c00; --warn-bg: #fdf1dc;
+  --stop: #b3261e; --stop-bg: #fbe4e2; --ok: #2b7a3a; --ok-bg: #e2f3e5; color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 400 1.0625rem/1.55 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 4rem;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+main { max-width: 46rem; margin: 0 auto; display: grid; gap: 2.5rem; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: 2.3rem; letter-spacing: .005em; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.15rem; font-weight: 600; margin-top: .5rem; }
+p { margin: 0; }
+a { color: var(--purple); }
+code, .mono { font-family: var(--f-mono); font-size: .88em; }
+code { background: var(--surface-2); border: 1px solid var(--line); padding: .05em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; font-family: var(--f-mono); font-size: .82rem; line-height: 1.45; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: .8rem 1rem; overflow-x: auto; }
+pre code { background: none; border: 0; padding: 0; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* top bar */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding: .55rem max(16px, env(safe-area-inset-right, 0px)) .55rem max(16px, env(safe-area-inset-left, 0px));
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.bar-in { max-width: 46rem; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+.bar-count { font-family: var(--f-mono); font-size: .85rem; font-variant-numeric: tabular-nums; color: var(--fg-dim); white-space: nowrap; }
+.meter { flex: 1 1 8rem; height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; min-width: 6rem; }
+.meter i { display: block; height: 100%; width: 0; background: var(--gold); transition: width .2s; }
+.btn { font: 600 .85rem var(--f-body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 5px; padding: .3rem .7rem; cursor: pointer; }
+.btn:hover { border-color: var(--gold); }
+.btn.danger { color: var(--stop); border-color: var(--stop); }
+.confirm { display: flex; gap: .4rem; align-items: center; font-size: .85rem; }
+.confirm[hidden] { display: none; }
+.toc { display: flex; flex-wrap: wrap; gap: .3rem .9rem; font-size: .9rem; }
+.toc a { text-decoration: none; color: var(--fg-dim); }
+.toc a:hover { color: var(--gold); }
+
+header.top { padding-top: 1.6rem; display: grid; gap: .8rem; }
+.eyebrow { font: 600 .78rem var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+.lede { color: var(--fg-dim); max-width: 40rem; }
+
+section { display: grid; gap: 1rem; scroll-margin-top: 4.5rem; }
+.sec-head { display: flex; align-items: baseline; gap: .7rem; border-bottom: 1px solid var(--line); padding-bottom: .4rem; }
+.sec-num { font: 600 .9rem var(--f-mono); color: var(--gold); }
+.sec-head .sec-prog { margin-left: auto; font: .8rem var(--f-mono); color: var(--fg-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* steps */
+ol.steps, ul.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+li.step { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: .1rem .6rem; align-items: start; padding: .55rem .7rem; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+li.step > input { width: 1.2rem; height: 1.2rem; margin: .2rem 0 0; accent-color: var(--gold); cursor: pointer; grid-row: 1 / span 9; }
+li.step > .c { min-width: 0; display: grid; gap: .45rem; }
+li.step .t { font-weight: 600; cursor: pointer; }
+li.step.done { opacity: .62; }
+li.step.done .t { text-decoration: line-through; text-decoration-color: var(--fg-dim); }
+.dim { color: var(--fg-dim); }
+.small { font-size: .9rem; }
+ul.plain { margin: 0; padding-left: 1.2rem; display: grid; gap: .2rem; }
+
+/* callouts */
+.note, .warn, .stop, .expect { border-radius: 6px; padding: .55rem .75rem; display: grid; gap: .3rem; font-size: .96rem; }
+.note { background: var(--surface-2); border: 1px solid var(--line); }
+.warn { background: var(--warn-bg); border: 1px solid var(--warn); }
+.warn > b:first-child, .warn .h { color: var(--warn); }
+.stop { background: var(--stop-bg); border: 1px solid var(--stop); }
+.stop > b:first-child { color: var(--stop); }
+.expect { background: var(--ok-bg); border: 1px solid var(--ok); }
+.expect > b:first-child { color: var(--ok); font: 600 .78rem var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
+.expect table { width: 100%; }
+
+/* tables */
+.tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+th, td { text-align: left; padding: .4rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 .75rem var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-dim); background: var(--surface); }
+tr:last-child td { border-bottom: 0; }
+td.num, .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.expect td, .expect th { border-color: color-mix(in srgb, var(--ok) 35%, transparent); background: transparent; padding: .25rem .4rem; }
+
+/* map */
+figure { margin: 0; display: grid; gap: .5rem; }
+.map { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: .5rem; }
+.map svg { display: block; width: 100%; min-width: 540px; height: auto; }
+figcaption { font-size: .88rem; color: var(--fg-dim); }
+.legend { display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; font-size: .85rem; color: var(--fg-dim); }
+.sw { display: inline-block; width: .8rem; height: .8rem; vertical-align: -.1rem; margin-right: .3rem; border-radius: 2px; }
+
+svg .pcb { fill: var(--board); stroke: var(--board-edge); stroke-width: .3; }
+svg .hole { fill: var(--bg); stroke: var(--fg-dim); stroke-width: .2; }
+svg .peg { fill: none; stroke: var(--fg-dim); stroke-width: .2; stroke-dasharray: .5 .4; }
+svg .pad { fill: var(--gold); }
+svg .p1 { fill: var(--stop); }
+svg .body { fill: none; stroke: var(--fg-dim); stroke-width: .22; }
+svg .bodyf { fill: var(--surface-2); stroke: var(--fg-dim); stroke-width: .22; }
+svg .lead { stroke: var(--gold); stroke-width: .3; fill: none; opacity: .75; }
+svg .pol { fill: var(--warn); }
+svg .polline { stroke: var(--warn); stroke-width: .45; fill: none; }
+svg .hatch { fill: url(#hatch); }
+svg .zone { fill: none; stroke: var(--purple); stroke-width: .25; stroke-dasharray: 1 .6; }
+svg text { fill: var(--fg); font-family: var(--f-mono); font-size: 1.35px; }
+svg text.s { font-size: 1.05px; fill: var(--fg-dim); }
+svg text.ref { font-size: 1.3px; font-weight: 600; }
+svg text.probe { fill: var(--purple); font-weight: 600; font-size: 1.15px; }
+svg text.edge { fill: var(--fg-dim); font-size: 1.3px; letter-spacing: .05px; }
+svg .probe-dot { fill: none; stroke: var(--purple); stroke-width: .3; }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .6rem; }
+.two > * { min-width: 0; }
+kbd { font: .82em var(--f-mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: 0 .3em; background: var(--surface-2); }
+
+/* bag MPN chip on a step */
+.bag { justify-self: start; font: 600 .82rem var(--f-mono); color: var(--gold); background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: .1rem .45rem; overflow-wrap: anywhere; }
+
+/* highlighted map copies: the step's parts in full colour, everything else greyed */
+svg.hl .part { opacity: .16; transition: opacity .15s; }
+svg.hl .part.on { opacity: 1; }
+svg.hl .part.on .bodyf { fill: color-mix(in srgb, var(--gold) 24%, var(--surface-2)); stroke: var(--gold); stroke-width: .45; }
+svg.hl .part.on .body { stroke: var(--gold); stroke-width: .45; }
+svg.hl .part.on .zone { stroke: var(--gold); stroke-width: .45; }
+svg.hl .part.on text.ref { fill: var(--gold); }
+svg .ring { fill: none; stroke: var(--gold); stroke-width: .4; }
+svg text.ringlab { fill: var(--gold); font-weight: 600; font-size: 1.2px; }
+svg.wd text { font-size: 2.6px; }
+svg.wd text.s { font-size: 2.1px; fill: var(--fg-dim); }
+svg.wd text.ref { font-size: 2.5px; font-weight: 600; }
+svg.wd text.warn { fill: var(--warn); }
+svg.wd .bodyf, svg.wd .body { stroke-width: .35; }
+svg.wd .bodyf.hl { fill: color-mix(in srgb, var(--gold) 24%, var(--surface-2)); stroke: var(--gold); }
+svg.wd .lead { stroke-width: .5; }
+svg .wire { stroke: var(--fg); stroke-width: .6; fill: none; }
+svg .wire.updi { stroke: var(--gold); }
+svg .wire.gnd { stroke: var(--fg-dim); }
+svg .wire.nc { stroke-dasharray: 1 .8; stroke: var(--warn); }
+svg .xmark { stroke: var(--warn); stroke-width: .6; fill: none; }
+svg .bb { fill: none; stroke: var(--line); stroke-width: .4; stroke-dasharray: 1 .6; }
+svg .strip { stroke: var(--line); stroke-width: 2; stroke-linecap: round; }
+svg .pad.dimmed { opacity: .35; }
+.fig-slot .stepmap { max-width: 36rem; }
+.maplabel { font: 600 .74rem var(--f-mono); letter-spacing: .04em; color: var(--gold); padding: .15rem .3rem .3rem; }
+svg.hl .part.rw:not(.on) { display: none; }
+svg .trace { stroke: var(--purple); stroke-width: .45; fill: none; stroke-dasharray: .9 .5; }
+svg .cutx { stroke: var(--stop); stroke-width: .55; fill: none; }
+svg text.cutlab { fill: var(--stop); font-weight: 700; font-size: 1.4px; }
+svg .rbody { stroke: var(--gold); stroke-width: 1.7; stroke-linecap: round; }
+svg .wire2 { stroke: var(--ok); stroke-width: .45; fill: none; }
+svg text.rlab { fill: var(--ok); font-size: 1.1px; }
+svg .arrowhd { fill: none; stroke: var(--fg); stroke-width: .6; }
+svg .lead2 { stroke: var(--gold); stroke-width: .35; fill: none; }
+svg .lead2.sleeve { stroke: var(--ok); stroke-width: .6; }
+svg .bridge { stroke: var(--gold); stroke-width: .8; stroke-linecap: round; }
+.stepmap { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: .3rem; max-width: 26rem; }
+.stepmap svg { display: block; width: 100%; min-width: 0; height: auto; }
+
+/* step-by-step view */
+.focus { position: fixed; inset: 0; z-index: 20; background: var(--bg); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.focus[hidden] { display: none; }
+.f-top, .f-bot { background: var(--surface); border-color: var(--line); border-style: solid; border-width: 0;
+  padding: .55rem max(16px, env(safe-area-inset-right, 0px)) .55rem max(16px, env(safe-area-inset-left, 0px)); }
+.f-top { border-bottom-width: 1px; padding-top: calc(.55rem + env(safe-area-inset-top, 0px)); }
+.f-bot { border-top-width: 1px; padding-bottom: calc(.55rem + env(safe-area-inset-bottom, 0px)); }
+.f-row { max-width: 64rem; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .8rem; }
+.f-sec { font: 600 .8rem var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--gold); }
+.f-pos { font: .85rem var(--f-mono); color: var(--fg-dim); font-variant-numeric: tabular-nums; }
+.f-top .btn:last-child { margin-left: auto; }
+.f-main { overflow-y: auto; padding: 1rem max(16px, env(safe-area-inset-right, 0px)) 1.5rem max(16px, env(safe-area-inset-left, 0px)); }
+.f-grid { max-width: 64rem; margin: 0 auto; display: grid; gap: 1rem 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); align-items: start; }
+.f-map { display: grid; gap: .4rem; min-width: 0; }
+.f-map[hidden] { display: none; }
+.f-map .stepmap { max-width: none; }
+.f-map .stepmap svg { max-height: 62vh; }
+.f-body { display: grid; gap: .6rem; min-width: 0; }
+.f-body .t { font: 700 1.45rem/1.2 var(--f-display); }
+.f-body.done .t { text-decoration: line-through; text-decoration-color: var(--fg-dim); }
+.f-check { display: inline-flex; align-items: center; gap: .45rem; font-weight: 600; cursor: pointer; }
+.f-check input { width: 1.2rem; height: 1.2rem; accent-color: var(--gold); }
+.f-bot .btn { padding: .45rem .9rem; font-size: .95rem; }
+@media (max-width: 40rem) { .f-bot .spacer { display: none; } .f-bot .f-row { gap: .5rem; justify-content: space-between; } .f-sec { flex-basis: 100%; } }
+.f-bot .btn.primary { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
+.f-bot .spacer { flex: 1; }
+.f-keys { font-size: .8rem; color: var(--fg-dim); }
+@media (max-width: 40rem) { .f-keys { display: none; } }
+a.stepln { color: var(--gold); font-weight: 600; }
+li.step .go { justify-self: start; font: 600 .78rem var(--f-body); color: var(--fg-dim); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+li.step .go:hover { color: var(--gold); }
+
+@media (prefers-reduced-motion: reduce) { .meter i { transition: none; } svg.hl .part { transition: none; } }
+
+@media print {
+  :root, :root[data-theme="dark"], :root[data-theme="light"] {
+    --bg: #fff; --surface: #fff; --surface-2: #f2f0f5; --line: #bbb; --fg: #000; --fg-dim: #444;
+    --gold: #7a5c00; --purple: #4a2f88; --board: #fff; --board-edge: #333; --warn: #8a5000; --warn-bg: #fff;
+    --stop: #a00; --stop-bg: #fff; --ok: #1d6b2c; --ok-bg: #fff; color-scheme: light;
+  }
+  body { font-size: 10.5pt; padding-block: 0; }
+  body::before, .bar, .toc, .noprint, .focus, li.step .go { display: none !important; }
+  main { max-width: none; gap: 1.2rem; }
+  section { break-inside: auto; }
+  li.step, .warn, .stop, .expect, figure, pre, .tw { break-inside: avoid; }
+  li.step.done { opacity: 1; }
+  .map svg { min-width: 0; }
+}
+</style>
+
+<div class="bar" role="region" aria-label="Progress">
+  <div class="bar-in">
+    <span class="bar-count" id="count">0 / 0 steps</span>
+    <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+    <button class="btn" id="focus-btn" type="button">Step by step</button>
+    <button class="btn" id="theme-btn" type="button">Light</button>
+    <span id="reset-wrap"><button class="btn" id="reset-btn" type="button">Reset progress</button></span>
+    <span id="confirm-wrap" class="confirm" hidden>Clear every tick?
+      <button class="btn danger" id="reset-yes" type="button">Clear</button>
+      <button class="btn" id="reset-no" type="button">Cancel</button></span>
+  </div>
+</div>
+
+<main>
+<header class="top">
+  <span class="eyebrow">TM-V71A head/body proxy · Rev A · data-line rework</span>
+  <h1>Kenwood Proxy Rework</h1>
+  <p class="lede">The radio's two data wires run the opposite way to the board's design. This rework re-routes them on this board without cutting any traces: J2 pin 3 bent out of its hole, R2 replaced by a long-lead 470 Ω that reaches it, and JP1 bridged. Then a firmware reflash.</p>
+  <nav class="toc" aria-label="Sections">
+    <a href="#why">What changes</a><a href="#prep">1 Prepare</a><a href="#bend">2 J2 pin 3</a><a href="#r2">3 Remove R2</a><a href="#newr">4 New 470 Ω</a>
+    <a href="#jp1">5 Bridge JP1</a><a href="#check">6 Check</a><a href="#secure">7 Clearance</a><a href="#flash">8 Reflash</a><a href="#truck">9 Truck test</a><a href="#map">Board map</a>
+  </nav>
+  <div class="note small"><span><b>Use the Step by step button.</b> Each step shows its own diagram. Underside views are drawn as you see the board after flipping it left-to-right like a page, connector edge still at the top.</span></div>
+</header>
+
+<!-- WHY -->
+<section id="why">
+  <div class="sec-head"><span class="sec-num">·</span><h2>What changes</h2></div>
+  <div class="fig-slot" data-fig="fig-paths"></div>
+  <div class="tw"><table>
+    <thead><tr><th>Pin</th><th>Before</th><th>After</th></tr></thead>
+    <tbody>
+      <tr><td class="num">J1-3</td><td>J2-3 direct; R7 → AVR pin 3 (unused)</td><td><b>R7 → AVR pin 3</b> (the AVR's receive). The path to J2-3 ends at an empty hole.</td></tr>
+      <tr><td class="num">J1-4</td><td>R6 → AVR pin 23 (the AVR's receive); JP1 open</td><td><b>JP1 bridged → J2-4.</b> R6 still taps it, unused.</td></tr>
+      <tr><td class="num">J2-3</td><td>J1-3 direct</td><td><b>New 470 Ω (replaces R2) → AVR pin 2</b> (the AVR's send). Pin bent out of its hole.</td></tr>
+      <tr><td class="num">J2-4</td><td>R2 → AVR pin 2; JP1 open</td><td><b>JP1 bridged → J1-4.</b> R2 removed.</td></tr>
+      <tr><td class="num">Pins 1, 2</td><td colspan="2">PB and GND: unchanged</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 1 PREP -->
+<section id="prep">
+  <div class="sec-head"><span class="sec-num">1</span><h2>Prepare</h2><span class="sec-prog" data-sec="prep"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="rw-tools"><span class="t">Gather: iron, wick, tack flux, needle-nose pliers, flush cutters, meter, a spare 470 Ω with full-length leads, a Dupont jumper (for its insulation).</span></li>
+    <li class="step" data-id="rw-avr" data-parts="U1"><span class="t">Cables unplugged. Wrist strap on. Pull the AVR out of its socket and put it in its foam.</span></li>
+  </ol>
+</section>
+
+<!-- 2 BEND -->
+<section id="bend">
+  <div class="sec-head"><span class="sec-num">2</span><h2>J2 pin 3 out of its hole</h2><span class="sec-prog" data-sec="bend"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="rw-bend" data-parts="-R2 BENT J2" data-under="-R2 J2.3" data-fig="fig-j2under"><span class="t">J2 pin 3 is out of its hole and bent back so its tip sticks out behind J2 on the top side.</span>
+      <span class="dim small">Pin 3 is the upper pin beside J2's square pin 1, on the side away from J1 when seen from underneath (close-up). Its old hole may still hold solder; that's fine as long as the pin isn't touching it.</span>
+    </li>
+    <li class="step" data-id="rw-bend-check" data-parts="-R2 BENT J2" data-under="-R2 J1.3 J2.3"><span class="t">Meter: the bent pin must be disconnected from the board.</span>
+      <div class="expect"><b>Expected</b>
+        <table><tr><td>Bent J2 pin 3 ↔ J1 pin 3</td><td class="num">open</td></tr>
+        <tr><td>J2 pin 3's empty hole (underside) ↔ J1 pin 3</td><td class="num">≈ 0 Ω (old trace, now a dead end)</td></tr></table>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- 3 R2 -->
+<section id="r2">
+  <div class="sec-head"><span class="sec-num">3</span><h2>Remove R2</h2><span class="sec-prog" data-sec="r2"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="rw-r2-cut" data-parts="R2 R2H"><span class="t">Top side: snip R2's leads close to its body and lift the body off.</span><span class="dim small">R2 is the resistor just below R6, at the left edge.</span></li>
+    <li class="step" data-id="rw-r2-holes" data-parts="-R2 R2H.1 R2H.2" data-under="-R2 R2H.1 R2H.2" data-zoom="37 21 18 8"><span class="t">Heat each joint and pull the stubs out with pliers. Clear the LEFT hole (top view) with wick so a new lead fits.</span>
+      <div class="warn"><b>⚠️ Right hole stays empty.</b><span>R2's right hole is on the J2-4 / JP1 line. Nothing goes in it.</span></div>
+      <span class="dim small">From underneath, the hole to clear is the one nearer the board's edge (circled, mirrored).</span>
+    </li>
+  </ol>
+</section>
+
+<!-- 4 NEW R -->
+<section id="newr">
+  <div class="sec-head"><span class="sec-num">4</span><h2>Fit the new 470 Ω</h2><span class="sec-prog" data-sec="newr"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="rw-newr-meter"><span class="t">Meter a spare 470 Ω with full-length leads.</span><span class="bag">MFR-25FBF52-470R · meter 465–475</span></li>
+    <li class="step" data-id="rw-newr-sleeve"><span class="t">Slide a piece of insulation stripped off a Dupont wire over the lead that will run to J2.</span><span class="dim small">The long lead passes close to R6's and R7's leads; the sleeve removes any doubt.</span></li>
+    <li class="step" data-id="rw-newr-fit" data-parts="-R2 NEWR2 BENT R2H.1"><span class="t">One lead through R2's LEFT hole, soldered underneath. Route the other lead as drawn and solder it to the tip of J2's bent pin 3.</span>
+      <span class="dim small">Route: along the gap between the R6/R7 row and the JP1/C1 row, up through the gap between R6 and R7, then across to J2. Not in a straight line: that would cross R6's right lead.</span>
+    </li>
+  </ol>
+</section>
+
+<!-- 5 JP1 -->
+<section id="jp1">
+  <div class="sec-head"><span class="sec-num">5</span><h2>Bridge JP1</h2><span class="sec-prog" data-sec="jp1"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="rw-jp1" data-parts="-R2 JP1"><span class="t">Fit the JP1 shunt across both pins.</span><span class="dim small">This is now the permanent head→body path. A soldered bridge on the underside (a clipped resistor lead) also works if you'd rather.</span></li>
+  </ol>
+</section>
+
+<!-- 6 CHECK -->
+<section id="check">
+  <div class="sec-head"><span class="sec-num">6</span><h2>Check before power</h2><span class="sec-prog" data-sec="check"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="rw-check" data-parts="-R2 NEWR2 BENT R2H.2 U1.2 U1.3" data-under="-R2 J1.3 J1.4 J2.4"><span class="t">AVR still out. Meter these.</span>
+      <div class="expect"><b>Expected</b>
+        <table>
+          <tr><td>Bent J2 pin 3 ↔ J1 pin 3</td><td class="num">open</td></tr>
+          <tr><td>Bent J2 pin 3 ↔ socket pin 2 (bottom row, 2nd from left, top view)</td><td class="num">≈ 470 Ω</td></tr>
+          <tr><td>J1 pin 3 ↔ socket pin 3 (bottom row, 3rd from left, top view)</td><td class="num">≈ 10 kΩ</td></tr>
+          <tr><td>R2's empty right hole ↔ socket pin 2</td><td class="num">open</td></tr>
+          <tr><td>J1 pin 4 ↔ J2 pin 4</td><td class="num">≈ 0 Ω</td></tr>
+          <tr><td>Bent J2 pin 3 and J2 pin 4 ↔ TP2</td><td class="num">not near 0</td></tr>
+        </table>
+      </div>
+      <div class="stop"><b>STOP</b><span>Anything different: don't power it. Tell Claude which reading is off.</span></div>
+    </li>
+  </ol>
+</section>
+
+<!-- 7 SECURE -->
+<section id="secure">
+  <div class="sec-head"><span class="sec-num">7</span><h2>Clearance check</h2><span class="sec-prog" data-sec="secure"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="rw-secure" data-parts="-R2 NEWR2 BENT"><span class="t">Optional: check the new resistor's long lead and the bent pin sit clear of other metal, especially R6's and R7's leads.</span><span class="dim small">Soldered at both ends, it stays put. Heat-shrink isn't needed.</span></li>
+  </ol>
+</section>
+
+<!-- 8 FLASH -->
+<section id="flash">
+  <div class="sec-head"><span class="sec-num">8</span><h2>Reflash (bench)</h2><span class="sec-prog" data-sec="flash"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="rw-avr-in" data-parts="U1"><span class="t">Refit the AVR, notch to the left.</span></li>
+    <li class="step" data-id="rw-power" data-parts="R1.1 TP2"><span class="t">Bench supply 10 V, 30 mA limit: + on R1's left lead, − on TP2. Output on: about 5 mA.</span></li>
+    <li class="step" data-id="rw-prog" data-parts="J4.1 J4.2" data-fig="fig-updi"><span class="t">FT232 programmer to J4: row B → pin 2, GND → pin 1 (the GND pin, not DTR). Then Claude runs the flash.</span>
+      <pre><code>make flash-forward PORT=/dev/cu.usbserial-A50285BI</code></pre>
+      <span class="dim small">This build takes the body's data on PC1 through R7 (setting <code>KP_BODY_ON_USART1</code>, on by default).</span>
+    </li>
+    <li class="step" data-id="rw-prog-off"><span class="t">Supply off. Unplug the programmer from J4.</span></li>
+  </ol>
+</section>
+
+<!-- 9 TRUCK -->
+<section id="truck">
+  <div class="sec-head"><span class="sec-num">9</span><h2>Truck test</h2><span class="sec-prog" data-sec="truck"></span></div>
+  <ol class="steps">
+    <li class="step" data-id="rw-t-body" data-parts="BENT J2" data-under="-R2 J2.1 J2.2 J2.4 TP2"><span class="t">Body cable only, radio DC on. Measure to TP2.</span>
+      <div class="expect"><b>Expected</b>
+        <table><tr><td>J2 pin 1 (PB)</td><td class="num">≈ 10 V</td></tr><tr><td>J2 pin 2 (GND)</td><td class="num">0 V</td></tr>
+        <tr><td>Bent J2 pin 3 (data to head, from the AVR)</td><td class="num">≈ 5 V</td></tr><tr><td>J2 pin 4 (data from head, to the body)</td><td class="num">≈ 5 V</td></tr></table>
+      </div>
+      <div class="stop"><b>STOP</b><span>10 V anywhere except pin 1: unplug and don't connect the head.</span></div>
+    </li>
+    <li class="step" data-id="rw-t-run" data-parts="J1 J2"><span class="t">Plug in the head. Press its power button.</span>
+      <div class="expect"><b>Expected</b><span>The radio powers up and works normally: display, keys, knob, brightness.</span></div>
+    </li>
+    <li class="step" data-id="rw-t-fail" data-parts="U1.2 U1.3"><span class="t">Only if it doesn't: radio off, pull the AVR, push a short wire into socket pins 2 and 3 to link them. Radio on.</span>
+      <span class="dim small">Get-home fallback: the body's data reaches the head through R7 and the new 470 Ω. It's a weaker signal than direct copper, so tell Claude what happened.</span>
+    </li>
+  </ol>
+</section>
+
+<!-- 3 MAP -->
+<section id="map">
+  <div class="sec-head"><span class="sec-num">·</span><h2>Board map (after rework)</h2></div>
+  <figure>
+    <div class="map">
+<svg viewBox="-3 -6 60 62" role="img" aria-labelledby="map-title">
+  <title id="map-title">Top view of the Rev A board with part outlines, pin 1 and polarity marks</title>
+  <defs>
+    <pattern id="hatch" width=".7" height=".7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width=".7" height=".7" fill="none"/>
+      <line x1="0" y1="0" x2="0" y2=".7" style="stroke: var(--warn); stroke-width: .3"/>
+    </pattern>
+  </defs>
+  <text class="edge" x="27" y="-2.6" text-anchor="middle">TOP EDGE · connector faces flush · ▲ cables plug in here</text>
+  <rect class="pcb" x="0" y="0" width="54" height="52" rx="1"/>
+  <!-- mounting holes -->
+  <circle class="hole" cx="3.5" cy="3.5" r="1.6"/><circle class="hole" cx="50.5" cy="3.5" r="1.6"/>
+  <circle class="hole" cx="50.5" cy="48.5" r="1.6"/><circle class="hole" cx="3.5" cy="48.5" r="1.6"/>
+
+  <!-- ILL isolated zone -->
+  <g class="part" data-part="ILL">
+  <rect class="zone" x="34.6" y="0.6" width="19" height="23.9" rx=".6"/>
+  <text class="s" x="48.6" y="9" text-anchor="middle">ILL ZONE</text>
+  <text class="s" x="48.6" y="10.4" text-anchor="middle">no pour</text>
+  </g>
+
+  <!-- J1 BODY -->
+  <g class="part" data-part="J1">
+  <rect class="bodyf" x="8.33" y="0" width="10" height="13"/>
+  <circle class="peg" cx="8.33" cy="6" r="1.18"/><circle class="peg" cx="18.33" cy="6" r="1.18"/>
+  <rect class="p1" data-pin="1" x="11.05" y="7.55" width="1.5" height="1.5"/>
+  <circle class="pad" data-pin="2" cx="12.82" cy="10.84" r=".75"/><circle class="pad" data-pin="3" cx="13.84" cy="8.3" r=".75"/><circle class="pad" data-pin="4" cx="14.86" cy="10.84" r=".75"/>
+  <text class="ref" x="13.33" y="3.3" text-anchor="middle">J1 BODY</text>
+  <text class="s" x="11.8" y="6.6" text-anchor="middle">1</text>
+  </g>
+  <!-- J2 HEAD -->
+  <g class="part" data-part="J2">
+  <rect class="bodyf" x="21.33" y="0" width="10" height="13"/>
+  <circle class="peg" cx="21.33" cy="6" r="1.18"/><circle class="peg" cx="31.33" cy="6" r="1.18"/>
+  <rect class="p1" data-pin="1" x="24.05" y="7.55" width="1.5" height="1.5"/>
+  <circle class="pad" data-pin="2" cx="25.82" cy="10.84" r=".75"/><circle class="pad" data-pin="3" cx="26.84" cy="8.3" r=".75"/><circle class="pad" data-pin="4" cx="27.86" cy="10.84" r=".75"/>
+  <text class="ref" x="26.33" y="3.3" text-anchor="middle">J2 HEAD</text>
+  <text class="s" x="24.8" y="6.6" text-anchor="middle">1</text>
+  </g>
+  <!-- J3 -->
+  <g class="part" data-part="J3">
+  <rect class="bodyf" x="35.8" y="0.4" width="7.4" height="10.1"/>
+  <circle class="peg" cx="39.5" cy="5.1" r="1"/>
+  <rect class="p1" data-pin="1" x="38.7" y="8.62" width="1.6" height="1.6" rx=".3"/>
+  <circle class="pad" data-pin="2" cx="39.5" cy="12.42" r=".8"/>
+  <text class="ref" x="39.5" y="2.6" text-anchor="middle">J3 ILL</text>
+  <text class="s" x="44" y="9.8">1 ILL+</text>
+  <text class="s" x="41" y="13">2 GND</text>
+  </g>
+
+  <!-- R9 R10 D1 -->
+  <g class="part" data-part="R9">
+  <line class="lead" x1="39.4" y1="15.8" x2="52.1" y2="15.8"/>
+  <rect class="bodyf" x="42.6" y="14.6" width="6.4" height="2.4" rx=".6"/>
+  <circle class="pad" cx="39.4" cy="15.8" r=".75"/><circle class="pad" cx="52.1" cy="15.8" r=".75"/>
+  <text class="ref" x="45.8" y="16.3" text-anchor="middle">R9</text>
+  </g>
+  <g class="part" data-part="R10">
+  <line class="lead" x1="39.4" y1="19.3" x2="47.02" y2="19.3"/>
+  <rect class="bodyf" x="41.2" y="18.3" width="4" height="2" rx=".5"/>
+  <circle class="pad" cx="39.4" cy="19.3" r=".75"/><circle class="pad" cx="47.02" cy="19.3" r=".75"/>
+  <text class="ref" x="43.2" y="19.75" text-anchor="middle">R10</text>
+  </g>
+  <g class="part" data-part="D1">
+  <line class="lead" x1="39.4" y1="22.3" x2="47.02" y2="22.3"/>
+  <rect class="bodyf" x="41.09" y="21.2" width="4.24" height="2.2" rx=".4"/>
+  <rect class="pol" x="41.6" y="21.2" width=".6" height="2.2"/>
+  <rect class="p1" x="38.65" y="21.55" width="1.5" height="1.5" rx=".3"/>
+  <circle class="pad" cx="47.02" cy="22.3" r=".75"/>
+  <text class="ref" x="43.8" y="22.75" text-anchor="middle">D1</text>
+  <text class="s" x="36.2" y="22.7" text-anchor="middle">K</text>
+  </g>
+  <!-- U3 -->
+  <g class="part" data-part="U3">
+  <rect class="bodyf" x="48.3" y="20.4" width="5.4" height="5.8" rx=".3"/>
+  <circle class="pol" cx="52.4" cy="21.5" r=".45"/>
+  <rect class="p1" x="51.55" y="18.75" width="1.5" height="1.5" rx=".3"/>
+  <circle class="pad" cx="49.76" cy="19.5" r=".75"/><circle class="pad" cx="49.76" cy="27.12" r=".75"/><circle class="pad" cx="52.3" cy="27.12" r=".75"/>
+  <text class="ref" x="50.6" y="24" text-anchor="middle">U3</text>
+  </g>
+
+  <!-- R6 R7 R2 -->
+  <g class="part" data-part="R6">
+  <line class="lead" x1="3" y1="20.6" x2="13.16" y2="20.6"/>
+  <rect class="bodyf" x="5.1" y="19.5" width="6" height="2.2" rx=".5"/>
+  <circle class="pad" data-pin="1" cx="3" cy="20.6" r=".75"/><circle class="pad" data-pin="2" cx="13.16" cy="20.6" r=".75"/>
+  <text class="ref" x="8.1" y="21.05" text-anchor="middle">R6</text>
+  <circle class="probe-dot" cx="13.16" cy="20.6" r="1.25"/>
+  <text class="probe" x="13.16" y="18.7" text-anchor="middle">CH0</text>
+  </g>
+  <g class="part" data-part="R7">
+  <line class="lead" x1="16" y1="20.6" x2="26.16" y2="20.6"/>
+  <rect class="bodyf" x="18.1" y="19.5" width="6" height="2.2" rx=".5"/>
+  <circle class="pad" data-pin="1" cx="16" cy="20.6" r=".75"/><circle class="pad" data-pin="2" cx="26.16" cy="20.6" r=".75"/>
+  <text class="ref" x="21.1" y="21.05" text-anchor="middle">R7</text>
+  <circle class="probe-dot" cx="26.16" cy="20.6" r="1.25"/>
+  <text class="probe" x="26.16" y="18.7" text-anchor="middle">CH1</text>
+  </g>
+  <g class="part" data-part="R2">
+  <line class="lead" x1="3" y1="25" x2="13.16" y2="25"/>
+  <rect class="bodyf" x="5.1" y="23.9" width="6" height="2.2" rx=".5"/>
+  <text class="ref" x="8.1" y="25.45" text-anchor="middle">R2</text>
+  </g>
+  <g class="part" data-part="R2H">
+  <circle class="pad" data-pin="1" cx="3" cy="25" r=".75"/><circle class="pad" data-pin="2" cx="13.16" cy="25" r=".75"/>
+  <text class="s" x="8.1" y="27.2" text-anchor="middle">R2 holes</text>
+  </g>
+  <!-- JP1 -->
+  <g class="part" data-part="JP1">
+  <rect class="body" x="15.25" y="23.75" width="5.04" height="2.5" rx=".3"/>
+  <rect class="p1" x="15.75" y="24.25" width="1.5" height="1.5"/>
+  <circle class="pad" cx="19.04" cy="25" r=".75"/>
+  <text class="ref" x="17.8" y="23.2" text-anchor="middle">JP1</text>
+  </g>
+  <!-- C1 -->
+  <g class="part" data-part="C1">
+  <rect class="body" x="22.9" y="24.1" width="4.3" height="1.8" rx=".8"/>
+  <circle class="pad" cx="23.82" cy="25" r=".7"/><circle class="pad" cx="26.32" cy="25" r=".7"/>
+  <text class="ref" x="25.07" y="23.5" text-anchor="middle">C1</text>
+  </g>
+  <!-- Y1 -->
+  <g class="part" data-part="Y1">
+  <rect class="bodyf" x="34.05" y="17" width="2" height="6" rx=".9"/>
+  <line class="lead" x1="34.6" y1="23" x2="34.1" y2="25"/><line class="lead" x1="35.5" y1="23" x2="36" y2="25"/>
+  <circle class="pad" cx="34.1" cy="25" r=".6"/><circle class="pad" cx="36" cy="25" r=".6"/>
+  <text class="ref" x="32.4" y="20.4" text-anchor="middle">Y1</text>
+  </g>
+
+  <!-- U1 socket (pads 2-28 are added by the script) -->
+  <g class="part" data-part="U1">
+  <path class="bodyf" d="M4.6 27 H40.4 V37.4 H4.6 V33.4 A1.2 1.2 0 0 0 4.6 31 Z"/>
+  <g id="u1pins">
+    <rect class="p1" data-pin="1" x="5.25" y="35.25" width="1.5" height="1.5" rx=".3"/>
+  </g>
+  <text class="ref" x="22.5" y="32.2" text-anchor="middle">U1 socket · AVR128DB28</text>
+  <text class="s" x="22.5" y="33.8" text-anchor="middle">◀ notch / pin 1 at the left</text>
+  <text class="s" x="6" y="38.9" text-anchor="middle">1</text>
+  <text class="s" x="21.24" y="38.9" text-anchor="middle">7</text>
+  <text class="s" x="39.02" y="38.9" text-anchor="middle">14</text>
+  <text class="s" x="41.3" y="28.75">15</text>
+  </g>
+  <!-- C7 C8 C2 -->
+  <g class="part" data-part="C7">
+  <circle class="pad" cx="42.4" cy="30" r=".7"/><circle class="pad" cx="42.4" cy="27.5" r=".7"/>
+  <rect class="body" x="41.5" y="26.6" width="1.8" height="4.3" rx=".8"/>
+  <text class="ref" x="42.4" y="32.4" text-anchor="middle">C7</text>
+  </g>
+  <g class="part" data-part="C8">
+  <circle class="pad" cx="45.8" cy="30" r=".7"/><circle class="pad" cx="45.8" cy="27.5" r=".7"/>
+  <rect class="body" x="44.9" y="26.6" width="1.8" height="4.3" rx=".8"/>
+  <text class="ref" x="45.8" y="32.4" text-anchor="middle">C8</text>
+  </g>
+  <g class="part" data-part="C2">
+  <circle class="pad" cx="42.5" cy="35.5" r=".7"/><circle class="pad" cx="42.5" cy="33" r=".7"/>
+  <rect class="body" x="41.6" y="32.1" width="1.8" height="4.3" rx=".8"/>
+  <text class="ref" x="44" y="35.9">C2</text>
+  </g>
+  <!-- R11, lies flat, rotated 90 degrees -->
+  <g class="part" data-part="R11">
+  <line class="lead" x1="51.5" y1="29.84" x2="51.5" y2="40"/>
+  <rect class="bodyf" x="50.4" y="32" width="2.2" height="5.8" rx=".5"/>
+  <circle class="pad" cx="51.5" cy="29.84" r=".75"/><circle class="pad" cx="51.5" cy="40" r=".75"/>
+  <text class="ref" x="51.5" y="35.3" text-anchor="middle" transform="rotate(-90 51.5 34.9)">R11</text>
+  </g>
+  <!-- TP2 -->
+  <g class="part" data-part="TP2">
+  <circle class="pad" cx="46.5" cy="37.4" r="1"/>
+  <circle class="probe-dot" cx="46.5" cy="37.4" r="1.6"/>
+  <text class="probe" x="46.5" y="40.3" text-anchor="middle">TP2 GND</text>
+  </g>
+
+  <!-- C3 R13 R1 -->
+  <g class="part" data-part="C3">
+  <rect class="body" x="12.6" y="38.9" width="4.3" height="1.8" rx=".8"/>
+  <circle class="pad" cx="13.5" cy="39.8" r=".7"/><circle class="pad" cx="16" cy="39.8" r=".7"/>
+  <text class="ref" x="14.75" y="42.4" text-anchor="middle">C3</text>
+  </g>
+  <g class="part" data-part="R13">
+  <line class="lead" x1="19" y1="39.8" x2="29.16" y2="39.8"/>
+  <rect class="bodyf" x="21.1" y="38.7" width="6" height="2.2" rx=".5"/>
+  <circle class="pad" cx="19" cy="39.8" r=".75"/><circle class="pad" cx="29.16" cy="39.8" r=".75"/>
+  <text class="ref" x="24.1" y="40.25" text-anchor="middle">R13</text>
+  </g>
+  <g class="part" data-part="R1">
+  <line class="lead" x1="32.2" y1="42.5" x2="47.44" y2="42.5"/>
+  <rect class="bodyf" x="35.6" y="41.1" width="8.4" height="2.8" rx=".8"/>
+  <circle class="pad" data-pin="1" cx="32.2" cy="42.5" r=".8"/><circle class="pad" data-pin="2" cx="47.44" cy="42.5" r=".8"/>
+  <text class="ref" x="39.8" y="43" text-anchor="middle">R1 1 W</text>
+  <text class="probe" x="31.2" y="42.9" text-anchor="end">PB</text>
+  </g>
+  <!-- J4 -->
+  <g class="part" data-part="J4">
+  <rect class="body" x="8.7" y="44.7" width="7.7" height="2.6" rx=".3"/>
+  <rect class="p1" data-pin="1" x="9.25" y="45.25" width="1.5" height="1.5"/>
+  <circle class="pad" data-pin="2" cx="12.54" cy="46" r=".75"/><circle class="pad" data-pin="3" cx="15.08" cy="46" r=".75"/>
+  <text class="ref" x="7.9" y="46.45" text-anchor="end">J4</text>
+  <text class="s" x="10" y="48.9" text-anchor="middle">GND</text>
+  <text class="s" x="12.54" y="48.9" text-anchor="middle">UPDI</text>
+  <text class="s" x="15.08" y="48.9" text-anchor="middle">TX</text>
+  </g>
+  <!-- C6 -->
+  <g class="part" data-part="C6">
+  <circle class="body" cx="20" cy="48.5" r="2.6"/>
+  <path class="hatch" d="M21 46.1 A2.6 2.6 0 0 1 21 50.9 Z"/>
+  <rect class="p1" x="18.3" y="47.8" width="1.4" height="1.4" rx=".3"/>
+  <circle class="pad" cx="21" cy="48.5" r=".7"/>
+  <text class="ref" x="17.0" y="46.8" text-anchor="middle" style="fill: var(--warn)">+</text>
+  <text class="ref" x="20" y="45.3" text-anchor="middle">C6</text>
+  </g>
+  <!-- C5 -->
+  <g class="part" data-part="C5">
+  <rect class="body" x="23.6" y="47.6" width="4.3" height="1.8" rx=".8"/>
+  <circle class="pad" cx="24.5" cy="48.5" r=".7"/><circle class="pad" cx="27" cy="48.5" r=".7"/>
+  <text class="ref" x="25.75" y="46.6" text-anchor="middle">C5</text>
+  </g>
+  <!-- U2 -->
+  <g class="part" data-part="U2">
+  <path class="body" d="M31.3 46.65 H36.6 A2.65 2.65 0 0 1 31.3 46.65 Z"/>
+  <line class="polline" x1="31.3" y1="46.65" x2="36.6" y2="46.65"/>
+  <circle class="pad" cx="31.42" cy="48.5" r=".7"/><circle class="pad" cx="33.96" cy="48.5" r=".7"/>
+  <rect class="p1" x="35.8" y="47.8" width="1.4" height="1.4"/>
+  <text class="ref" x="33.96" y="45.6" text-anchor="middle">U2 flat ▲</text>
+  <text class="s" x="31.42" y="51.4" text-anchor="middle">IN</text>
+  <text class="s" x="33.96" y="51.4" text-anchor="middle">GND</text>
+  <text class="s" x="36.5" y="51.4" text-anchor="middle">OUT</text>
+  </g>
+  <!-- C4 -->
+  <g class="part" data-part="C4">
+  <circle class="body" cx="41.75" cy="48.5" r="2.9"/>
+  <rect class="p1" x="39.8" y="47.8" width="1.4" height="1.4" rx=".3"/>
+  <circle class="pad" cx="43" cy="48.5" r=".7"/>
+  <text class="ref" x="38.4" y="46.4" text-anchor="middle" style="fill: var(--warn)">+</text>
+  <text class="ref" x="45.2" y="49" >C4</text>
+  </g>
+  <!-- rework additions -->
+  <g class="part rw" data-part="BENT">
+    <line class="lead" x1="26.84" y1="11.6" x2="26.84" y2="14.1"/>
+    <circle class="pad" cx="26.84" cy="14.4" r=".55"/>
+    <text class="rlab" x="28" y="15.3">J2 pin 3 (bent out)</text>
+  </g>
+  <g class="part rw" data-part="NEWR2">
+    <path class="lead2" d="M3 25 L3.8 22.9 L4.3 22.9"/>
+    <line class="rbody" x1="4.6" y1="22.9" x2="10.2" y2="22.9"/>
+    <text class="rlab" x="7.4" y="24.6" text-anchor="middle">new 470 Ω</text>
+    <path class="lead2 sleeve" d="M10.5 22.9 L14.6 22.9 L14.6 18 L26.84 14.6"/>
+    <text class="rlab" x="20.5" y="18.6">sleeved lead</text>
+  </g>
+  <g class="part rw" data-part="JP1BR"><line class="bridge" x1="16.5" y1="25" x2="19.04" y2="25"/></g>
+</svg>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background: var(--stop)"></i>Square pad: pin 1, + or cathode</span>
+      <span><i class="sw" style="background: var(--warn)"></i>Polarity mark (band, dot, flat, −)</span>
+      <span><i class="sw" style="border: 1.5px solid var(--purple)"></i>Probe point</span>
+      <span><i class="sw" style="border: 1.5px dashed var(--purple)"></i>ILL zone</span>
+    </div>
+    <figcaption>Top view, drawn from pad coordinates in the PCB file. Bodies are approximate. The board silkscreen and the printed <code>checks/board_top_1to1.pdf</code> are authoritative. Seen from the solder side, everything is mirrored left to right.</figcaption>
+  </figure>
+</section>
+<template id="fig-updi"><svg class="wd" viewBox="0 0 120 58" role="img" aria-label="Programmer wiring: CH340 TX to breadboard row A, 2.2 kilohm from row A to row B, CH340 RX to row B, row B to J4 pin 2 UPDI, CH340 GND to J4 pin 1, CH340 5V not connected">
+  <text class="ref" x="3" y="7">CH340 #1 · jumper on 5V</text>
+  <rect class="bodyf" x="3" y="10" width="26" height="42" rx="1"/>
+  <text x="26.5" y="17.9" text-anchor="end">5V/VCC</text><text x="26.5" y="27.9" text-anchor="end">TX</text>
+  <text x="26.5" y="37.9" text-anchor="end">RX</text><text x="26.5" y="47.9" text-anchor="end">GND</text>
+  <circle class="pad" cx="29" cy="17" r="1"/><circle class="pad" cx="29" cy="27" r="1"/><circle class="pad" cx="29" cy="37" r="1"/><circle class="pad" cx="29" cy="47" r="1"/>
+  <line class="wire nc" x1="29" y1="17" x2="36" y2="17"/>
+  <path class="xmark" d="M36 15.6 L38.8 18.4 M38.8 15.6 L36 18.4"/>
+  <text class="s warn" x="41" y="17.8">not connected</text>
+  <text class="s" x="59" y="20.6" text-anchor="middle">breadboard</text>
+  <rect class="bb" x="44" y="22" width="30" height="19" rx="1"/>
+  <line class="strip" x1="46" y1="27" x2="72" y2="27"/><line class="strip" x1="46" y1="37" x2="72" y2="37"/>
+  <text class="s" x="46.5" y="25.4">row A</text><text class="s" x="46.5" y="40.2">row B</text>
+  <line class="lead" x1="64" y1="27" x2="64" y2="37"/>
+  <rect class="bodyf hl" x="62.6" y="29" width="2.8" height="6" rx=".6"/>
+  <text class="ref" x="67" y="32.9">2.2 kΩ</text>
+  <line class="wire" x1="29" y1="27" x2="49" y2="27"/><line class="wire" x1="29" y1="37" x2="49" y2="37"/>
+  <line class="wire updi" x1="70" y1="37" x2="95" y2="37"/>
+  <text class="s" x="83" y="35.4" text-anchor="middle">M-F jumper</text>
+  <line class="wire gnd" x1="29" y1="47" x2="95" y2="47"/>
+  <text class="s" x="83" y="45.4" text-anchor="middle">F-F jumper</text>
+  <text class="ref" x="97" y="20.6" text-anchor="middle">board J4</text>
+  <rect class="body" x="92.5" y="23.5" width="5" height="27" rx=".5"/>
+  <circle class="pad dimmed" cx="95" cy="27" r="1"/><circle class="pad" cx="95" cy="37" r="1"/><rect class="p1" x="94" y="46" width="2" height="2"/>
+  <text class="s" x="99" y="27.8">3 TX (logger)</text><text x="99" y="37.9">2 UPDI</text><text x="99" y="47.9">1 GND</text>
+  <text class="s" x="60" y="56" text-anchor="middle">Board power: bench supply (10 V on R1's left lead) or the radio. Never the adapter.</text>
+</svg></template>
+<template id="fig-j2under"><svg class="wd" viewBox="0 0 120 64" role="img" aria-label="J2 seen from the underside: from left to right pin 4 (lower), pin 3 (upper), pin 2 (lower), pin 1 square (upper). J1 is to the right.">
+  <line class="strip" x1="2" y1="5" x2="118" y2="5"/>
+  <text class="s" x="60" y="3.2" text-anchor="middle">board edge (top) · cables plug in here</text>
+  <rect class="body" x="14" y="7" width="76" height="50" rx="1"/>
+  <text class="ref" x="17" y="12">J2 HEAD · seen from UNDERNEATH</text>
+  <circle class="peg" cx="20" cy="30" r="3"/><circle class="peg" cx="84" cy="30" r="3"/>
+  <text class="s" x="104" y="28" text-anchor="middle">J1 BODY</text>
+  <text class="s" x="104" y="31.5" text-anchor="middle">is this way →</text>
+  <circle class="pad" cx="38" cy="43" r="3"/><circle class="pad" cx="48" cy="22" r="3"/>
+  <circle class="pad" cx="58" cy="43" r="3"/><rect class="p1" x="65" y="19" width="6" height="6"/>
+  <text class="ref" x="68" y="15.5" text-anchor="middle">1 · PB</text><text x="68" y="31" text-anchor="middle">≈ 10 V</text>
+  <text class="ref" x="48" y="15.5" text-anchor="middle">3 · to head</text><text x="48" y="31" text-anchor="middle">≈ 5 V</text>
+  <text class="ref" x="58" y="51" text-anchor="middle">2 · GND</text><text x="58" y="55" text-anchor="middle">0 V</text>
+  <text class="ref" x="35" y="51" text-anchor="middle">4 · from head</text><text x="35" y="55" text-anchor="middle">≈ 5 V</text>
+  <text class="s warn" x="60" y="62" text-anchor="middle">Square pad = pin 1. 10 V anywhere except pin 1: stop.</text>
+</svg></template>
+<template id="fig-paths"><svg class="wd" viewBox="0 0 120 62" role="img" aria-label="After the rework: pin 3 from the body goes through R7, the AVR and R2 to the head; pin 4 from the head goes straight across through JP1 to the body. The old direct pin 3 path is broken by bending J2 pin 3 out of its hole.">
+  <rect class="bodyf" x="2" y="8" width="18" height="46" rx="1"/><text class="ref" x="11" y="6">BODY</text>
+  <rect class="bodyf" x="100" y="8" width="18" height="46" rx="1"/><text class="ref" x="109" y="6" text-anchor="middle">HEAD</text>
+  <text class="s" x="22" y="19">J1-3</text><text class="s" x="91" y="19">J2-3</text>
+  <rect class="bodyf hl" x="50" y="11" width="20" height="12" rx="1"/><text class="ref" x="60" y="18.4" text-anchor="middle">AVR</text>
+  <line class="wire updi" x1="20" y1="17" x2="34" y2="17"/><rect class="bodyf" x="34" y="15.6" width="7" height="2.8" rx=".5"/><text class="s" x="37.5" y="13.8" text-anchor="middle">R7 10k</text>
+  <line class="wire updi" x1="41" y1="17" x2="50" y2="17"/><line class="wire updi" x1="70" y1="17" x2="78" y2="17"/>
+  <rect class="bodyf hl" x="78" y="15.6" width="7" height="2.8" rx=".5"/><text class="s" x="81.5" y="13.8" text-anchor="middle">new 470</text>
+  <line class="wire updi" x1="85" y1="17" x2="100" y2="17"/>
+  <path class="xmark" d="M58 26 L62 30 M62 26 L58 30"/>
+  <line class="wire nc" x1="20" y1="28" x2="100" y2="28"/>
+  <text class="s warn" x="60" y="34" text-anchor="middle">old direct path: J2 pin 3 bent out of its hole</text>
+  <text class="s" x="60" y="9" text-anchor="middle">pin 3 · display data · body → head</text>
+  <path class="arrowhd" d="M96 15 L100 17 L96 19"/><path class="arrowhd" d="M24 44 L20 46 L24 48"/>
+  <line class="wire gnd" x1="100" y1="46" x2="20" y2="46"/>
+  <rect class="body" x="55" y="43.5" width="10" height="5" rx=".5"/><text class="s" x="60" y="46.8" text-anchor="middle">JP1</text>
+  <text class="s" x="22" y="44">J1-4</text><text class="s" x="91" y="44">J2-4</text>
+  <text class="s" x="60" y="53" text-anchor="middle">pin 4 · key presses · head → body · JP1 bridged</text>
+</svg></template>
+</main>
+
+<div class="focus" id="focus" hidden role="dialog" aria-modal="true" aria-labelledby="f-title">
+  <div class="f-top"><div class="f-row">
+    <span class="f-sec" id="f-sec"></span><span class="f-pos" id="f-pos"></span>
+    <button class="btn" id="f-close" type="button">Close (Esc)</button>
+  </div></div>
+  <div class="f-main" id="f-main"><div class="f-grid">
+    <div class="f-map" id="f-map"></div>
+    <div class="f-body" id="f-body">
+      <div class="t" id="f-title"></div>
+      <div id="f-content" style="display: grid; gap: .6rem"></div>
+    </div>
+  </div></div>
+  <div class="f-bot"><div class="f-row">
+    <button class="btn" id="f-prev" type="button">◀ Prev</button>
+    <label class="f-check"><input type="checkbox" id="f-done"> Done</label>
+    <span class="spacer"></span>
+    <span class="f-keys"><kbd>←</kbd> <kbd>→</kbd> move · <kbd>D</kbd> done</span>
+    <button class="btn" id="f-next" type="button">Next ▶</button>
+    <button class="btn primary" id="f-donenext" type="button">Done, next ▶</button>
+  </div></div>
+</div>
+
+<script>
+(function () {
+  var KEY = 'kp-rework-progress-v1';
+  var POS = 'kp-rework-focus-step';
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { state = {}; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  var ns = 'http://www.w3.org/2000/svg';
+
+  // U1 socket pads. Pin 1 (square) is in the markup. Bottom row: pins 1-14 left to right; top row: 15-28 right to left.
+  var g = document.getElementById('u1pins');
+  if (g) {
+    for (var i = 0; i < 14; i++) {
+      var x = 6 + 2.54 * i;
+      [[36, i + 1], [28.38, 28 - i]].forEach(function (rp) {
+        if (rp[1] === 1) return;
+        var c = document.createElementNS(ns, 'circle');
+        c.setAttribute('class', 'pad'); c.setAttribute('cx', x.toFixed(2)); c.setAttribute('cy', rp[0]); c.setAttribute('r', '.7');
+        c.setAttribute('data-pin', rp[1]);
+        g.appendChild(c);
+      });
+    }
+  }
+
+  // Copy of the board map with the given parts highlighted.
+  // Tokens: "R6" highlights a part; "R1.1" highlights the part and rings its pin 1.
+  var master = document.querySelector('#map svg');
+  function buildMap(spec, under, zoom) {
+    var svg = master.cloneNode(true);
+    svg.querySelectorAll('defs, title').forEach(function (n) { n.remove(); });
+    svg.querySelectorAll('[id]').forEach(function (n) { n.removeAttribute('id'); });
+    svg.removeAttribute('aria-labelledby');
+    svg.classList.add('hl');
+    var names = [];
+    spec.trim().split(/\s+/).forEach(function (tok) {
+      if (tok.charAt(0) === '-') { var hp = svg.querySelector('[data-part="' + tok.slice(1) + '"]'); if (hp) hp.style.display = 'none'; return; }
+      var bits = tok.split('.'), ref = bits[0], pin = bits[1];
+      var part = svg.querySelector('[data-part="' + ref + '"]');
+      if (!part) return;
+      part.classList.add('on');
+      names.push(pin ? ref + ' pin ' + pin : ref);
+      if (!pin) return;
+      var el = part.querySelector('[data-pin="' + pin + '"]');
+      if (!el) return;
+      var cx, cy;
+      if (el.tagName.toLowerCase() === 'rect') {
+        cx = +el.getAttribute('x') + el.getAttribute('width') / 2; cy = +el.getAttribute('y') + el.getAttribute('height') / 2;
+      } else { cx = +el.getAttribute('cx'); cy = +el.getAttribute('cy'); }
+      var r = document.createElementNS(ns, 'circle');
+      r.setAttribute('class', 'ring'); r.setAttribute('cx', cx); r.setAttribute('cy', cy); r.setAttribute('r', (ref === 'J1' || ref === 'J2') ? '1.05' : '1.5');
+      svg.appendChild(r);
+      if (ref === 'U1' || ref === 'J1' || ref === 'J2') {
+        var t = document.createElementNS(ns, 'text');
+        t.setAttribute('class', 'ringlab'); t.setAttribute('x', cx); t.setAttribute('text-anchor', 'middle');
+        if (ref === 'U1') t.setAttribute('y', cy < 32 ? cy - 2 : cy + 3.1);
+        else t.setAttribute('y', cy < 9.5 ? cy - 1.9 : cy + 2.9);
+        t.textContent = pin;
+        svg.appendChild(t);
+      }
+    });
+    if (under) {
+      // Solder-side view: mirror left-right (board flipped like a page, connector edge still on top).
+      // Text is flipped back so it stays readable, and its anchor swaps sides.
+      var gm = document.createElementNS(ns, 'g');
+      gm.setAttribute('transform', 'translate(54 0) scale(-1 1)');
+      while (svg.firstChild) gm.appendChild(svg.firstChild);
+      svg.appendChild(gm);
+      gm.querySelectorAll('text').forEach(function (t) {
+        var x = +t.getAttribute('x') || 0, prev = t.getAttribute('transform') || '';
+        t.setAttribute('transform', 'translate(' + (2 * x) + ' 0) scale(-1 1) ' + prev);
+        var a = t.getAttribute('text-anchor');
+        t.setAttribute('text-anchor', a === 'end' ? 'start' : a === 'middle' ? 'middle' : 'end');
+        if (t.classList.contains('edge')) t.textContent = 'TOP EDGE · UNDERSIDE (solder side), mirrored';
+      });
+    }
+    if (zoom) svg.setAttribute('viewBox', zoom);
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', (under ? 'Underside view, mirrored, with ' : 'Board map with ') + names.join(', ') + ' highlighted');
+    var wrap = document.createElement('div'); wrap.className = 'stepmap';
+    var cap = document.createElement('div'); cap.className = 'maplabel';
+    cap.textContent = under ? (zoom ? 'UNDERSIDE, CLOSE-UP' : 'UNDERSIDE: flip the board left-to-right like a page; the connector edge stays at the top')
+                            : 'TOP (component side)';
+    wrap.appendChild(cap);
+    wrap.appendChild(svg);
+    return wrap;
+  }
+
+  // Wiring diagrams live in <template> elements; steps name one with data-fig.
+  function buildFig(id) {
+    var tpl = document.getElementById(id);
+    var wrap = document.createElement('div'); wrap.className = 'stepmap';
+    if (tpl) wrap.appendChild(tpl.content.firstElementChild.cloneNode(true));
+    return wrap;
+  }
+  document.querySelectorAll('.fig-slot').forEach(function (slot) { slot.appendChild(buildFig(slot.dataset.fig)); });
+
+  var steps = Array.prototype.slice.call(document.querySelectorAll('main li.step'));
+  steps.forEach(function (li, idx) {
+    var id = 'cb-' + li.dataset.id;
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.id = id; cb.checked = !!state[li.dataset.id];
+    var c = document.createElement('div'); c.className = 'c';
+    while (li.firstChild) c.appendChild(li.firstChild);
+    var t = c.querySelector('.t');
+    if (t) { var lab = document.createElement('label'); lab.htmlFor = id; lab.className = 't'; lab.innerHTML = t.innerHTML; t.replaceWith(lab); }
+    // Soldering steps show their own highlighted map in the list too.
+    if (li.dataset.under && li.dataset.zoom) c.appendChild(buildMap(li.dataset.under, true, li.dataset.zoom));
+    if (li.dataset.under) c.appendChild(buildMap(li.dataset.under, true));
+    if (li.dataset.parts && (li.closest('#solder') || li.dataset.under)) c.appendChild(buildMap(li.dataset.parts));
+    if (li.dataset.fig) c.appendChild(buildFig(li.dataset.fig));
+    var go = document.createElement('button');
+    go.type = 'button'; go.className = 'go'; go.textContent = 'Open in step-by-step view';
+    go.addEventListener('click', function () { openFocus(idx); });
+    c.appendChild(go);
+    li.appendChild(cb); li.appendChild(c);
+    li.classList.toggle('done', cb.checked);
+    cb.addEventListener('change', function () { setDone(li, cb.checked); });
+  });
+
+  function setDone(li, on) {
+    var cb = li.querySelector('input');
+    cb.checked = on;
+    if (on) state[li.dataset.id] = 1; else delete state[li.dataset.id];
+    li.classList.toggle('done', on); save(); update();
+    if (!focus.hidden && steps[cur] === li) renderFocus();
+  }
+
+  function update() {
+    var done = steps.filter(function (li) { return li.querySelector('input').checked; }).length;
+    document.getElementById('count').textContent = done + ' / ' + steps.length + ' steps';
+    document.getElementById('meter').style.width = (steps.length ? 100 * done / steps.length : 0) + '%';
+    document.querySelectorAll('.sec-prog').forEach(function (el) {
+      var sec = document.getElementById(el.dataset.sec);
+      var s = sec.querySelectorAll('li.step'), d = sec.querySelectorAll('li.step > input:checked');
+      el.textContent = d.length + ' / ' + s.length;
+    });
+  }
+  update();
+
+  // ---- step-by-step view ----
+  var focus = document.getElementById('focus');
+  var fSec = document.getElementById('f-sec'), fPos = document.getElementById('f-pos');
+  var fMap = document.getElementById('f-map'), fBody = document.getElementById('f-body');
+  var fTitle = document.getElementById('f-title'), fContent = document.getElementById('f-content');
+  var fDone = document.getElementById('f-done'), fMain = document.getElementById('f-main');
+  var cur = 0, opener = null;
+
+  function sectionName(li) {
+    var sec = li.closest('section');
+    var num = sec.querySelector('.sec-num'), h = sec.querySelector('h2');
+    var name = (num ? num.textContent + ' · ' : '') + (h ? h.textContent : '');
+    var sub = li.closest('ol, ul').previousElementSibling;
+    if (sub && sub.tagName === 'H3') name += ' · ' + sub.textContent;
+    return name;
+  }
+
+  function renderFocus() {
+    var li = steps[cur];
+    var on = li.querySelector('input').checked;
+    fSec.textContent = sectionName(li);
+    fPos.textContent = 'Step ' + (cur + 1) + ' / ' + steps.length;
+    var src = li.querySelector('.c');
+    fTitle.innerHTML = src.querySelector('.t').innerHTML;
+    fContent.innerHTML = '';
+    Array.prototype.forEach.call(src.children, function (n) {
+      if (n.classList.contains('t') || n.classList.contains('stepmap') || n.classList.contains('go')) return;
+      fContent.appendChild(n.cloneNode(true));
+    });
+    fMap.innerHTML = '';
+    fMap.hidden = !li.dataset.parts && !li.dataset.fig && !li.dataset.under;
+    if (li.dataset.fig) fMap.appendChild(buildFig(li.dataset.fig));
+    if (li.dataset.under && li.dataset.zoom) fMap.appendChild(buildMap(li.dataset.under, true, li.dataset.zoom));
+    if (li.dataset.under) fMap.appendChild(buildMap(li.dataset.under, true));
+    if (li.dataset.parts) fMap.appendChild(buildMap(li.dataset.parts));
+    fDone.checked = on;
+    fBody.classList.toggle('done', on);
+    document.getElementById('f-prev').disabled = cur === 0;
+    document.getElementById('f-next').disabled = cur === steps.length - 1;
+    document.getElementById('f-donenext').textContent = cur === steps.length - 1 ? 'Done' : 'Done, next ▶';
+    try { localStorage.setItem(POS, li.dataset.id); } catch (e) {}
+  }
+
+  function go(i) {
+    cur = Math.max(0, Math.min(steps.length - 1, i));
+    renderFocus(); fMain.scrollTop = 0;
+  }
+
+  function openFocus(i) {
+    if (i == null) {
+      var saved = null;
+      try { saved = localStorage.getItem(POS); } catch (e) {}
+      i = steps.findIndex(function (li) { return li.dataset.id === saved; });
+      if (i < 0) i = steps.findIndex(function (li) { return !li.querySelector('input').checked; });
+      if (i < 0) i = 0;
+    }
+    opener = document.activeElement;
+    focus.hidden = false;
+    document.body.style.overflow = 'hidden';
+    go(i);
+    document.getElementById('f-donenext').focus();
+  }
+
+  function closeFocus() {
+    focus.hidden = true;
+    document.body.style.overflow = '';
+    var li = steps[cur];
+    li.scrollIntoView({ block: 'center' });
+    var target = li.querySelector('.go') || opener;
+    if (target) target.focus({ preventScroll: true });
+  }
+
+  document.getElementById('focus-btn').addEventListener('click', function () { openFocus(); });
+  document.querySelectorAll('a.stepln').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var i = steps.findIndex(function (li) { return li.dataset.id === a.dataset.step; });
+      if (i >= 0) openFocus(i);
+    });
+  });
+  // Steps confirmed done in the 2026-11-14 session.
+  var DONE_1114 = ['p-esd','p-pdf','p-jacks','p-dry','p-sort','p-res',
+    's-r-10k','s-r-470','s-r-680','s-r9','s-r1','s-d1','s-y1','s-y1-check','s-socket','s-u3','s-c104','s-c150',
+    's-headers','s-u2','s-c4','s-c6','s-j3','s-jacks','c-trim','c-clean','c-short','j-fit','j-id',
+    'c-inspect','k-h','a-set','a-wire','b-on','b-off','u-jump','u-build','u-wire','f-shunt','f-avr','f-conn','f-fuses','f-logwire'];
+  var md = document.getElementById('mark-done');
+  if (md) md.addEventListener('click', function () {
+    var n = 0;
+    steps.forEach(function (li) {
+      if (DONE_1114.indexOf(li.dataset.id) >= 0 && !li.querySelector('input').checked) { setDone(li, true); n++; }
+    });
+    document.getElementById('mark-done-msg').textContent = n ? 'Ticked ' + n + ' steps.' : 'Already ticked.';
+  });
+  document.getElementById('f-close').addEventListener('click', closeFocus);
+  document.getElementById('f-prev').addEventListener('click', function () { go(cur - 1); });
+  document.getElementById('f-next').addEventListener('click', function () { go(cur + 1); });
+  fDone.addEventListener('change', function () { setDone(steps[cur], fDone.checked); });
+  document.getElementById('f-donenext').addEventListener('click', function () {
+    setDone(steps[cur], true);
+    if (cur < steps.length - 1) go(cur + 1);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (focus.hidden || e.metaKey || e.ctrlKey || e.altKey) return;
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (e.key === 'Escape') { e.preventDefault(); closeFocus(); }
+    else if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
+    else if ((e.key === 'd' || e.key === 'D') && tag !== 'input') { e.preventDefault(); setDone(steps[cur], !steps[cur].querySelector('input').checked); }
+    else if (e.key === 'Tab') {
+      // keep keyboard focus inside the view
+      var f = Array.prototype.filter.call(focus.querySelectorAll('button, input, a[href]'), function (n) { return !n.disabled && n.offsetParent !== null; });
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  var rw = document.getElementById('reset-wrap'), cw = document.getElementById('confirm-wrap');
+  document.getElementById('reset-btn').addEventListener('click', function () { rw.hidden = true; cw.hidden = false; document.getElementById('reset-no').focus(); });
+  document.getElementById('reset-no').addEventListener('click', function () { cw.hidden = true; rw.hidden = false; });
+  document.getElementById('reset-yes').addEventListener('click', function () {
+    state = {}; save();
+    steps.forEach(function (li) { li.querySelector('input').checked = false; li.classList.remove('done'); });
+    update(); cw.hidden = true; rw.hidden = false;
+  });
+
+  var tb = document.getElementById('theme-btn'), root = document.documentElement;
+  function label() { tb.textContent = root.getAttribute('data-theme') === 'light' ? 'Dark' : 'Light'; }
+  label();
+  tb.addEventListener('click', function () {
+    var n = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', n);
+    try { localStorage.setItem('kp-guide-theme', n); } catch (e) {}
+    label();
+  });
+})();
+</script>

@@ -43,12 +43,12 @@ check('Netlist parity with design intent', not bad, '; '.join(bad))
 
 def on(net, ref, pin): return (ref, pin) in nets.get(net, set())
 
-# 3. Jack pin mapping. Data directions MEASURED on the radio 2026-11-15: body TX on pin 3, head TX on pin 4.
+# 3. Jack pin mapping (Wurth numbering, user-confirmed physical order)
 for j in ('J1', 'J2'):
-    check(f'{j} pin1 PB / pin2 GND / pin4 HEAD_TXD (head -> body, measured)',
-          actual.get((j,'1'))=='PB' and actual.get((j,'2'))=='GND' and actual.get((j,'4'))=='HEAD_TXD')
-check('J1 pin3 = BODY_TXD, J2 pin3 = HEAD_RXD (body -> head on pin 3, measured)', actual.get(('J1','3'))=='BODY_TXD' and actual.get(('J2','3'))=='HEAD_RXD')
-check('HEAD_TXD direct copper J2.4 to J1.4', on('HEAD_TXD','J1','4') and on('HEAD_TXD','J2','4'))
+    check(f'{j} pin1 PB / pin2 GND / pin3 HEAD_TXD',
+          actual.get((j,'1'))=='PB' and actual.get((j,'2'))=='GND' and actual.get((j,'3'))=='HEAD_TXD')
+check('J1 pin4 = BODY_TXD, J2 pin4 = HEAD_RXD (no TX/RX crossover)', actual.get(('J1','4'))=='BODY_TXD' and actual.get(('J2','4'))=='HEAD_RXD')
+check('HEAD_TXD direct copper J2.3 to J1.3', on('HEAD_TXD','J1','3') and on('HEAD_TXD','J2','3'))
 
 # 4. PB never touches any MCU, opto, or signal net; PB only reaches U2 through R1
 pb_nets = {'PB','PB_FILT'}
@@ -58,15 +58,11 @@ check('PB direct copper J1.1 to J2.1; board supply via R1', on('PB','J1','1') an
 
 # 5. Full-proxy data path: body -> MCU (tap) -> R2 -> head; JP1 is the only direct body/head bridge
 hr = nets['HEAD_RXD']
-check('HEAD_RXD connections limited to J2, JP1, R2, J5 (test tap)', {r for r,_ in hr} <= {'J2','JP1','R2','J5'}, str(sorted(hr)))
+check('HEAD_RXD connections limited to J2, JP1, R2', {r for r,_ in hr} <= {'J2','JP1','R2'}, str(sorted(hr)))
 check('BODY_TXD connections limited to J1, JP1, R6 (tap)', {r for r,_ in nets['BODY_TXD']} <= {'J1','JP1','R6'}, str(sorted(nets['BODY_TXD'])))
 check('Proxy output: U1 pin 2 (PC0, USART1 TX) -> R2 -> HEAD_RXD', on('HEAD_TX_MCU','U1','2') and on('HEAD_TX_MCU','R2','1') and on('HEAD_RXD','R2','2') and {r for r,_ in nets['HEAD_TX_MCU']} <= {'U1','R2'})
 check('JP1 hard bypass is the only part bridging BODY_TXD and HEAD_RXD', ({r for r,_ in nets['BODY_TXD']} & {r for r,_ in nets['HEAD_RXD']}) == {'JP1'} and on('BODY_TXD','JP1','1') and on('HEAD_RXD','JP1','2'))
 check('No U1 pin directly on any radio-line net', not any(r=='U1' for n in ('BODY_TXD','HEAD_RXD','HEAD_TXD') for r,_ in nets.get(n,())))
-
-# 5b. Test header J5: listen-only taps, never directly on a radio line except the head input after R2
-check('J5 taps: GND, TAP_BODY, TAP_HEAD, HEAD_RXD', [actual.get(('J5',k)) for k in '1234']==['GND','TAP_BODY','TAP_HEAD','HEAD_RXD'])
-check('TAP_BODY/TAP_HEAD only reach the radio through R6/R7 10k', {r for r,_ in nets['TAP_BODY']} <= {'R6','U1','J5'} and {r for r,_ in nets['TAP_HEAD']} <= {'R7','U1','J5'})
 
 # 6. ILL isolation: ILL_P/ILL_GND/ILL_LED_A never touch board nets
 ill = {'ILL_P','ILL_GND','ILL_LED_A'}

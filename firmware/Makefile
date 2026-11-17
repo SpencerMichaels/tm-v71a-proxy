@@ -6,11 +6,11 @@
 #   make log     LOGPORT=/dev/cu.Y read the DBG_TX event log (J4 pin 3)
 #   PROG=serialupdi57k             slow 57600-baud programming for flaky adapters (fuses/flash targets)
 #   make flash-sniff / make rawlog  copy the body->head stream raw to J4 pin 3 and record it
-#   REV=A-rework                   reworked Rev A board (body data on PC1 via R7). Default REV=B (PA1 via R6)
+#   REV=B                          Rev B board (body data on PA1 via R6). Default here: REV=A-rework (reworked Rev A, PC1 via R7)
 FQBN    = DxCore:megaavr:avrdb:chip=avr128db28,clock=20internal,millis=tcb2,startuptime=1,bodmode=enabled,bodvoltage=2v85,eesave=enable,mvio=disabled
 SKETCH  = kenwood_proxy
 PROG    ?= serialupdi
-REV     ?= B
+REV     ?= A-rework
 REVFLAG = $(if $(filter A-rework,$(REV)),-DKP_BODY_ON_USART1=1,-DKP_BODY_ON_USART1=0)
 PORT    ?= $(firstword $(wildcard /dev/cu.usbserial-*) $(wildcard /dev/cu.wchusbserial*))
 FORWARD = --build-property "compiler.c.extra_flags=-DKP_ENABLE_REWRITE=0 $(REVFLAG)" --build-property "compiler.cpp.extra_flags=-DKP_ENABLE_REWRITE=0 $(REVFLAG)"

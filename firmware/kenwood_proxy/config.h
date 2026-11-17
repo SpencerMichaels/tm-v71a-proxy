@@ -19,10 +19,10 @@
 #endif
 
 /* Where the body's data reaches the AVR.
- * 0 = Rev B (default): body data (cable pin 3) through R6 on PA1 (USART0 RX).
- * 1 = reworked Rev A (rev-a branch): body data through R7 on PC1 (USART1 RX). */
+ * 1 = reworked Rev A (default on this branch): body data through R7 on PC1 (USART1 RX).
+ * 0 = Rev B: body data (cable pin 3) through R6 on PA1 (USART0 RX). */
 #ifndef KP_BODY_ON_USART1
-#define KP_BODY_ON_USART1  0
+#define KP_BODY_ON_USART1  1
 #endif
 
 /* 1 = sniff build: every body->head byte is also copied raw to DBG_TX (J4 pin 3, same baud),

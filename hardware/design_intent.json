@@ -6,7 +6,7 @@
     "mpn": "615004143821",
     "manufacturer": "Wurth Elektronik",
     "fit": true,
-    "note": "Cable from radio body (already 4P4C). Pin 3 = body TX (measured), pin 4 = body RX, 2 = GND, 1 = PB",
+    "note": "Cable from radio body (already 4P4C). Tab up, mating face: L1..L4 = pins 4,3,2,1 = RXD,TXD,GND,PB",
     "assembly": "HAND_THT",
     "sheet": "01_radio_link",
     "pins": {
@@ -19,12 +19,12 @@
         "net": "GND"
       },
       "3": {
-        "name": "DATA_body-to-head",
-        "net": "BODY_TXD"
+        "name": "TXD_head-to-body",
+        "net": "HEAD_TXD"
       },
       "4": {
-        "name": "DATA_head-to-body",
-        "net": "HEAD_TXD"
+        "name": "RXD_body-to-head",
+        "net": "BODY_TXD"
       }
     }
   },
@@ -48,12 +48,12 @@
         "net": "GND"
       },
       "3": {
-        "name": "DATA_body-to-head",
-        "net": "HEAD_RXD"
+        "name": "TXD_head-to-body",
+        "net": "HEAD_TXD"
       },
       "4": {
-        "name": "DATA_head-to-body",
-        "net": "HEAD_TXD"
+        "name": "RXD_body-to-head",
+        "net": "HEAD_RXD"
       }
     }
   },
@@ -138,35 +138,6 @@
       "2": {
         "name": "",
         "net": "TAP_HEAD"
-      }
-    }
-  },
-  "J5": {
-    "symbol": "Connector_Generic_Conn_01x04",
-    "value": "DATA TAPS",
-    "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
-    "mpn": "PRPC040SAAN-RC",
-    "manufacturer": "Sullins",
-    "fit": true,
-    "note": "Bench/test taps for a logic analyzer or USB-serial RX: 1 GND, 2 body->head (via R6 10k), 3 head->body (via R7 10k), 4 what the head receives (after R2 470R). Snapped from the 40-pin strip. Listen only: never connect an adapter TX or power",
-    "assembly": "HAND_THT",
-    "sheet": "01_radio_link",
-    "pins": {
-      "1": {
-        "name": "Pin_1",
-        "net": "GND"
-      },
-      "2": {
-        "name": "Pin_2",
-        "net": "TAP_BODY"
-      },
-      "3": {
-        "name": "Pin_3",
-        "net": "TAP_HEAD"
-      },
-      "4": {
-        "name": "Pin_4",
-        "net": "HEAD_RXD"
       }
     }
   },
@@ -522,10 +493,10 @@
     "symbol": "Device_Crystal",
     "value": "32.768kHz 12.5pF",
     "footprint": "Crystal:Crystal_DS26_D2.0mm_L6.0mm_Horizontal",
-    "mpn": "AB26T-32.768KHZ",
+    "mpn": "AB26TRB-32.768KHZ-T",
     "manufacturer": "Abracon",
     "fit": true,
-    "note": "Through-hole long-lead variant (Rev A used AB26TRB, whose short formed leads barely reach). CL 12.5 pF, ESR 50k max (AVR XOSC32K limit 100k). Short traces, ground guard",
+    "note": "CL 12.5 pF, ESR 50k max (AVR XOSC32K limit 100k). Short traces, ground guard",
     "assembly": "HAND_THT",
     "sheet": "02_power_mcu",
     "pins": {
