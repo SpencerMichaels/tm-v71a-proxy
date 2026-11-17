@@ -42,12 +42,7 @@ Tested with a TM-V71A in a 2013 Toyota Tacoma. Any vehicle with a 12 V lights-on
 
    ![Case](hardware/enclosure/preview_assembled_front.png)
 
-6. **Install.**
-   - Body cable → J1, head cable → J2.
-   - J3 → the vehicle's ILL+ (live with the parking lights) and chassis ground.
-   - Then set the brightness once with the lights off and once with them on.
-
-   **Toyota vehicles (2003–2014, including the Tacoma) need a harness adapter to tap ILL+ and ground.** This build used the [RED WOLF 20-pin steering wheel control harness with RCA](https://www.amazon.com/dp/B09S33B8L1). It plugs into the factory radio connector, so nothing is cut. Identify the ILL+ and ground wires with a meter before connecting J3: ILL+ reads 11–14 V with the parking lights on and under 1 V with them off.
+6. **Install.** Body cable → J1, head cable → J2. J3 → the vehicle's ILL+ (live with the parking lights) and chassis ground. Then set the brightness once with the lights off and once with them on.
 
 ![Board map](docs/img/map.svg)
 

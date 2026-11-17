@@ -391,7 +391,6 @@ Print and assemble the case as described in [`hardware/enclosure/README.md`](../
   - body cable → J1
   - head cable → J2
   - J3 → ILL+ (TAIL: live with the parking lights or headlights) and chassis ground. Reversed J3 wiring is harmless (D1 protects the opto), but the lights input won't work.
-  - On 2003–2014 Toyotas (including the Tacoma), tap ILL+ and ground through a harness adapter that plugs into the factory radio connector, such as the [RED WOLF 20-pin steering wheel control harness](https://www.amazon.com/dp/B09S33B8L1). Confirm ILL+ with a meter: 11–14 V with the parking lights on, under 1 V off.
 - [ ] **Set the two brightness levels:** pick a brightness in the radio's menu with the lights off, then pick one with the lights on. The board remembers both levels and switches between them with the lights.
 
 ## 11. Recovery
